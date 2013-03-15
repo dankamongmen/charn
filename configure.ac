@@ -2,8 +2,7 @@ AC_PREREQ([2.61])
 AC_INIT([charn], [0.0.1-pre], [sprezzos-dev@sprezzatech.com], [charn], [https://www.sprezzatech.com/wiki/index.php/charn])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADERS([config.h:config.in])
-# Restore -Werror whenever we can! FIXME
-AM_INIT_AUTOMAKE([-Wall foreign dist-xz std-options subdir-objects nostdinc color-tests])
+AM_INIT_AUTOMAKE([-Werror -Wall foreign dist-xz std-options subdir-objects nostdinc color-tests])
 AC_CONFIG_SRCDIR([src/bin/charn.c])
 
 ## compiler check
@@ -19,6 +18,13 @@ AM_PROG_CC_C_O
 AX_PTHREAD
 
 AX_CHECK_GL
+LIBS+=${GL_LIBS}
+AX_CHECK_GLUT
+LIBS+=${GLUT_LIBS}
+
+PKG_CHECK_MODULES(GLEW, glew, [have_glew=yes])
+	CFLAGS+=" $GLEW_CFLAGS"
+	LIBS+=" $GLEW_LIBS"
 
 AX_PROG_XSLTPROC
 if test "x$XSLTPROC" = "x" ; then
