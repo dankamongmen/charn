@@ -17,12 +17,14 @@ int main(int argc,char **argv){
 	xcb_randr_get_screen_info_reply_t *sirt;
 	xcb_randr_query_version_cookie_t rqvct;
 	xcb_randr_query_version_reply_t *rqvrt;
+	xcb_randr_screen_size_t *sizes;
+	int prefscr,cursize,numsizes;
 	const xcb_setup_t *xcbsetup;
 	xcb_generic_error_t *xcberr;
 	xcb_connection_t *xcb;
 	xcb_screen_t *xscr;
 	xcb_window_t xwin;
-	int prefscr;
+	int z;
 
 	if((xcb = xcb_connect(NULL,&prefscr)) == NULL){
 		fprintf(stderr,"Couldn't connect to $DISPLAY via XCB\n");
@@ -51,14 +53,23 @@ int main(int argc,char **argv){
 	printf("Connected using XRandR protocol %d.%d\n",
 			rqvrt->major_version,rqvrt->minor_version);
 	free(rqvrt);
-	sict = xcb_randr_get_screen_info(xcb,xwin);
+	sict = xcb_randr_get_screen_info(xcb,xscr->root);
 	if((sirt = xcb_randr_get_screen_info_reply(xcb,sict,&xcberr)) == NULL){
 		// FIXME use xcberr
 		fprintf(stderr,"Couldn't get XRandR screen info\n");
 		return EXIT_FAILURE;
 	}
+	cursize = sirt->sizeID;
+	numsizes = sirt->nSizes;
+	if((sizes = xcb_randr_get_screen_info_sizes(sirt)) == NULL){
+		fprintf(stderr,"Couldn't get XRandR size info\n");
+		return EXIT_FAILURE;
+	}
+	for(z = 0 ; z < numsizes ; ++z){
+		printf("Size %03d: %dx%d\n",z,sizes[z].width,sizes[z].height);
+	}
 	free(sirt);
-	/* Glut-related initialising functions */
+	printf("Screen size ID: %d/%d\n",cursize,numsizes);
 	glutInit(&argc,argv);
 	glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE|GLUT_DEPTH);
 	glutInitWindowSize(640, 480);
