@@ -26,6 +26,10 @@ PKG_CHECK_MODULES(GLEW, glew, [have_glew=yes])
 	CFLAGS+=" $GLEW_CFLAGS"
 	LIBS+=" $GLEW_LIBS"
 
+PKG_CHECK_MODULES(XCBRANDR, xcb-randr, [have_xcb_randr=yes])
+	CFLAGS+=" $XCBRANDR_CFLAGS"
+	LIBS+=" $XCBRANDR_LIBS"
+
 AX_PROG_XSLTPROC
 if test "x$XSLTPROC" = "x" ; then
 	AC_MSG_ERROR([Cannot find xsltproc.])
