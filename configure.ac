@@ -26,6 +26,10 @@ PKG_CHECK_MODULES(GLEW, glew, [have_glew=yes])
 	CFLAGS+=" $GLEW_CFLAGS"
 	LIBS+=" $GLEW_LIBS"
 
+PKG_CHECK_MODULES(XCBAUX, xcb-aux, [have_xcb_aux=yes])
+	CFLAGS+=" $XCBAUX_CFLAGS"
+	LIBS+=" $XCBAUX_LIBS"
+
 PKG_CHECK_MODULES(XCBRANDR, xcb-randr, [have_xcb_randr=yes])
 	CFLAGS+=" $XCBRANDR_CFLAGS"
 	LIBS+=" $XCBRANDR_LIBS"
