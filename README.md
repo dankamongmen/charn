@@ -1,4 +1,7 @@
 # Charn
+by Nick Black (nick.black@sprezzatech.com)
+
+![image](doc/charn.gif)
 
 >It is silent now. But I have stood here when the whole air was full of the
 >noises of Charn; the trampling of feet, the creaking of wheels, the cracking of
