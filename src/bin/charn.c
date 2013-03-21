@@ -13,21 +13,25 @@ static GLuint texid; // texture id of quad
  
 static void
 onDisplay(void){
-	glClear(GL_COLOR_BUFFER_BIT);
-	glEnable(GL_TEXTURE_2D);
-	glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_DECAL);
-	glBindTexture(GL_TEXTURE_2D,texid);
+	//glClear(GL_COLOR_BUFFER_BIT);
+	if(texid){
+		glEnable(GL_TEXTURE_2D);
+		glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_DECAL);
+		glBindTexture(GL_TEXTURE_2D,texid);
+	}
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0,0.0);
-	glVertex3f(-1.0f,-1.0f,0.0f);
 	glTexCoord2f(0.0,1.0);
+	glVertex3f(-1.0f,-1.0f,0.0f);
+	glTexCoord2f(0.0,0.0);
 	glVertex3f(-1.0f,1.0f,0.0f);
-	glTexCoord2f(1.0,1.0);
-	glVertex3f(1.0f,1.0f,0.0f);
 	glTexCoord2f(1.0,0.0);
+	glVertex3f(1.0f,1.0f,0.0f);
+	glTexCoord2f(1.0,1.0);
 	glVertex3f(1.0f,-1.0f,0.0f);
 	glEnd();
-	glDisable(GL_TEXTURE_2D);
+	if(texid){
+		glDisable(GL_TEXTURE_2D);
+	}
 	glutSwapBuffers();
 }
 
@@ -121,7 +125,7 @@ int main(int argc,char **argv){
 	glutInit(&argc,argv);
 	glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE|GLUT_DEPTH);
 	printf("Screen size ID: %d/%d (%dx%d)\n",cursize,numsizes,curgeom.width,curgeom.height);
-	glutInitWindowSize(curgeom.width,curgeom.height);
+	glutInitWindowSize(curgeom.width / 2,curgeom.height / 2);
 	glutInitWindowPosition(0,0);
 	glutCreateWindow("Charn");
 	if(gl_init()){
