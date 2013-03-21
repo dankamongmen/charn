@@ -12,7 +12,7 @@ dist_man_MANS = charn.1
 
 doc_DIR=doc
 doc_DATA=
-doc_DATA+=README
+doc_DATA+=README.md
 
 dist_doc_DATA=
 dist_doc_DATA+=COPYING charn.xhtml

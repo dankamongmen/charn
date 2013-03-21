@@ -18,6 +18,29 @@ resizecb(int width,int height){
 	printf("GLUT resize event (%dx%d)\n",width,height);
 }
 
+static int
+gl_init(void){
+	GLenum types[] = {
+		GL_VENDOR,
+		GL_RENDERER,
+		GL_VERSION,
+		//GL_EXTENSIONS
+	},t;
+
+	printf("OpenGL ");
+	for(t = 0 ; t < sizeof(types) / sizeof(*types) ; ++t){
+		const GLubyte *glver = glGetString(types[t]);
+
+		if(glver){
+			printf("%s ",glver);
+		}else{
+			return -1;
+		}
+	}
+	printf("\n");
+	return 0;
+}
+
 int main(int argc,char **argv){
 	xcb_randr_get_screen_info_cookie_t sict;
 	xcb_randr_get_screen_info_reply_t *sirt;
@@ -79,6 +102,10 @@ int main(int argc,char **argv){
 	glutInitWindowSize(curgeom.width,curgeom.height);
 	glutInitWindowPosition(0,0);
 	glutCreateWindow("Charn");
+	if(gl_init()){
+		fprintf(stderr,"Error getting OpenGL version info\n");
+		return EXIT_FAILURE;
+	}
 	glClearColor(0.0f,0.0f,0.0f,0.0f);
 	glutReshapeFunc(resizecb);
 	glutDisplayFunc(onDisplay);
