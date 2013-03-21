@@ -6,7 +6,7 @@
 >sacrificial drums beating in the temples. I have stood here (but that was near
 >the end) when the roar of battle went up from every street and the river of
 >Charn ran red. All in one moment one woman blotted it out for ever.
-> - C.S. Lewis, The Magician's Newphew
+> C.S. Lewis, *The Magician's Newphew*
 
 ## Requirements
 
