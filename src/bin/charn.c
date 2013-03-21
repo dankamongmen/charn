@@ -6,6 +6,7 @@
 #include <GL/glut.h>
 #include <xcb/xcb.h>
 #include <xcb/randr.h>
+#include <SOIL/SOIL.h>
 #include <xcb/xcb_aux.h>
  
 void onDisplay(void){
