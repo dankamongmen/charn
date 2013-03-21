@@ -10,12 +10,22 @@
  
 void onDisplay(void){
 	glClear(GL_COLOR_BUFFER_BIT);
+	glBegin(GL_QUADS);
+	glVertex3f(-1.0f,-1.0f,0.0f);
+	glVertex3f(-1.0f,1.0f,0.0f);
+	glVertex3f(1.0f,1.0f,0.0f);
+	glVertex3f(1.0f,-1.0f,0.0f);
+	glEnd();
 	glutSwapBuffers();
 }
 
 static void
 resizecb(int width,int height){
 	printf("GLUT resize event (%dx%d)\n",width,height);
+	glViewport(0,0,(GLsizei)width,(GLsizei)height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
 }
 
 static int
