@@ -40,6 +40,11 @@ if test "x$XSLTPROC" = "x" ; then
 fi
 AX_CHECK_DOCBOOK_XSLT
 
+#AC_CHECK_LIB(soil,SOIL_load_OGL_texture)
+#if test "x$ac_cv_lib_SOIL_load_OGL_texture" = "x" ; then
+#	AC_MSG_ERROR([Cannot find libsoil.])
+#fi
+
 AC_PROG_LIBTOOL
 
 AC_CONFIG_MACRO_DIR([m4])

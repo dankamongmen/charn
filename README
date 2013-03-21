@@ -1,5 +1,4 @@
-Charn|
------'
+# Charn
 
 "It is silent now. But I have stood here when the whole air was full of the
  noises of Charn; the trampling of feet, the creaking of wheels, the cracking of
@@ -8,10 +7,14 @@ Charn|
  the end) when the roar of battle went up from every street and the river of
  Charn ran red. All in one moment one woman blotted it out for ever.”
 
-Requirements|
-------------'
+## Requirements
 
 Autotools + autoconf-gl-macros (if building from git checkout)
 OpenGL
 GLEW (www.opengl.org/sdk/libs/GLEW/)
 GLUT (www.opengl.org/resources/libraries/glut/)
+
+## Reading
+
+http://www.sprezzatech.com/blog/0014-new-directions-in-window-management-p1.html
+http://www.sprezzatech.com/blog/0015-new-directions-in-window-management-p2.html

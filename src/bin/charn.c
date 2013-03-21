@@ -13,6 +13,11 @@ void onDisplay(void){
 	glutSwapBuffers();
 }
 
+static void
+resizecb(int width,int height){
+	printf("GLUT resize event (%dx%d)\n",width,height);
+}
+
 int main(int argc,char **argv){
 	xcb_randr_get_screen_info_cookie_t sict;
 	xcb_randr_get_screen_info_reply_t *sirt;
@@ -75,7 +80,7 @@ int main(int argc,char **argv){
 	glutInitWindowPosition(0,0);
 	glutCreateWindow("Charn");
 	glClearColor(0.0f,0.0f,0.0f,0.0f);
-	/* We can display it if everything goes OK */
+	glutReshapeFunc(resizecb);
 	glutDisplayFunc(onDisplay);
 	glutMainLoop();
 	xcb_disconnect(xcb);
