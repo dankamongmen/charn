@@ -9,10 +9,10 @@
 
 ## Requirements
 
-Autotools + autoconf-gl-macros (if building from git checkout)
-OpenGL
-GLEW (www.opengl.org/sdk/libs/GLEW/)
-GLUT (www.opengl.org/resources/libraries/glut/)
+* Autotools + autoconf-gl-macros (if building from git checkout)
+* OpenGL
+* GLEW (www.opengl.org/sdk/libs/GLEW/)
+* GLUT (www.opengl.org/resources/libraries/glut/)
 
 ## Reading
 
