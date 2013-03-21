@@ -8,15 +8,26 @@
 #include <xcb/randr.h>
 #include <SOIL/SOIL.h>
 #include <xcb/xcb_aux.h>
+
+static GLuint texid; // texture id of quad
  
-void onDisplay(void){
+static void
+onDisplay(void){
 	glClear(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_DECAL);
+	glBindTexture(GL_TEXTURE_2D,texid);
 	glBegin(GL_QUADS);
+	glTexCoord2f(0.0,0.0);
 	glVertex3f(-1.0f,-1.0f,0.0f);
+	glTexCoord2f(0.0,1.0);
 	glVertex3f(-1.0f,1.0f,0.0f);
+	glTexCoord2f(1.0,1.0);
 	glVertex3f(1.0f,1.0f,0.0f);
+	glTexCoord2f(1.0,0.0);
 	glVertex3f(1.0f,-1.0f,0.0f);
 	glEnd();
+	glDisable(GL_TEXTURE_2D);
 	glutSwapBuffers();
 }
 
@@ -116,6 +127,16 @@ int main(int argc,char **argv){
 	if(gl_init()){
 		fprintf(stderr,"Error getting OpenGL version info\n");
 		return EXIT_FAILURE;
+	}
+	if(argv[1]){
+		texid = SOIL_load_OGL_texture(argv[1],0,0,0);
+		if(texid == 0){
+			fprintf(stderr,"Failure loading texture from %s (%s?)\n",
+					argv[1],SOIL_last_result());
+			return EXIT_FAILURE;
+		}
+	}else{
+		texid = 0;
 	}
 	glClearColor(0.0f,0.0f,0.0f,0.0f);
 	glutReshapeFunc(resizecb);
