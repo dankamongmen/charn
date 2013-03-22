@@ -118,7 +118,13 @@ int main(int argc,char **argv){
 		return EXIT_FAILURE;
 	}
 	for(z = 0 ; z < numsizes ; ++z){
-		printf("Size %03d: %dx%d\n",z,sizes[z].width,sizes[z].height);
+		printf("[%02d] %4dx%-4d  ",z,sizes[z].width,sizes[z].height);
+		if(z % 4 == 3){
+			printf("\n");
+		}
+	}
+	if(z % 4 != 3){
+		printf("\n");
 	}
 	memcpy(&curgeom,sizes + cursize,sizeof(curgeom));
 	free(sirt);
