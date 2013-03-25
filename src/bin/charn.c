@@ -69,16 +69,32 @@ resizecb(int width,int height){
 
 static int
 gl_init(void){
-	GLenum types[] = {
+	GLenum glsl_types[] = {
+		GL_SHADING_LANGUAGE_VERSION,
+	},types[] = {
 		GL_VENDOR,
 		GL_RENDERER,
 		GL_VERSION,
 		//GL_EXTENSIONS
 	},t;
+	int maj,min;
 
 	printf("OpenGL ");
 	for(t = 0 ; t < sizeof(types) / sizeof(*types) ; ++t){
 		const GLubyte *glver = glGetString(types[t]);
+
+		if(glver){
+			printf("%s ",glver);
+		}else{
+			return -1;
+		}
+	}
+	printf("\n");
+	glGetIntegerv(GL_MAJOR_VERSION,&maj);
+	glGetIntegerv(GL_MINOR_VERSION,&min);
+	printf("OpenGL level %d.%d GLSL ",maj,min);
+	for(t = 0 ; t < sizeof(glsl_types) / sizeof(*glsl_types) ; ++t){
+		const GLubyte *glver = glGetString(glsl_types[t]);
 
 		if(glver){
 			printf("%s ",glver);
