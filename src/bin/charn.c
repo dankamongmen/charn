@@ -6,10 +6,32 @@
 #include <GL/glut.h>
 #include <xcb/xcb.h>
 #include <xcb/randr.h>
+#include <FTGL/ftgl.h>
 #include <SOIL/SOIL.h>
 #include <xcb/xcb_aux.h>
 
+// This is my first OpenGL code ever. You are not advised to use it as a
+// reference, at all.
+
 static GLuint texid; // texture id of quad
+
+static int
+ftgl_init(void){
+	/* Create a pixmap font from a TrueType file. */
+	FTGLfont *font = ftglCreatePixmapFont("/usr/share/fonts/FreeSans.ttf");
+
+	/* If something went wrong, bail out. */
+	if(!font)
+		return -1;
+
+	/* Set the font size and render a small text. */
+	ftglSetFontFaceSize(font, 72, 72);
+	ftglRenderFont(font, "Hello World!", FTGL_RENDER_ALL);
+
+	/* Destroy the font object. */
+	ftglDestroyFont(font);
+	return 0;
+}
  
 static void
 onDisplay(void){
@@ -32,6 +54,7 @@ onDisplay(void){
 	if(texid){
 		glDisable(GL_TEXTURE_2D);
 	}
+	ftgl_init();
 	glutSwapBuffers();
 }
 

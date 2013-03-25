@@ -17,10 +17,19 @@ AM_PROG_CC_C_O
 
 AX_PTHREAD
 
+# Require autoconf-gl-macros: http://code.google.com/p/autoconf-gl-macros/
 AX_CHECK_GL
 LIBS+=${GL_LIBS}
 AX_CHECK_GLUT
 LIBS+=${GLUT_LIBS}
+
+PKG_CHECK_MODULES(FREETYPE, freetype2, [have_freetype2=yes])
+	CFLAGS+=" $FREETYPE_CFLAGS"
+	LIBS+=" $FREETYPE_LIBS"
+
+PKG_CHECK_MODULES(FTGL, ftgl, [have_ftgl=yes])
+	CFLAGS+=" $FTGL_CFLAGS"
+	LIBS+=" $FTGL_LIBS"
 
 PKG_CHECK_MODULES(GLEW, glew, [have_glew=yes])
 	CFLAGS+=" $GLEW_CFLAGS"
@@ -34,14 +43,14 @@ PKG_CHECK_MODULES(XCBRANDR, xcb-randr, [have_xcb_randr=yes])
 	CFLAGS+=" $XCBRANDR_CFLAGS"
 	LIBS+=" $XCBRANDR_LIBS"
 
+AC_SEARCH_LIBS([SOIL_load_OGL_texture],[SOIL],[],AC_MSG_ERROR([Cannot find libsoil.]))
+LIBS+=" $ac_cv_search_SOIL_load_OGL_texture"
+
 AX_PROG_XSLTPROC
 if test "x$XSLTPROC" = "x" ; then
 	AC_MSG_ERROR([Cannot find xsltproc.])
 fi
 AX_CHECK_DOCBOOK_XSLT
-
-AC_SEARCH_LIBS([SOIL_load_OGL_texture],[SOIL],[],AC_MSG_ERROR([Cannot find libsoil.]))
-LIBS+=" $ac_cv_search_SOIL_load_OGL_texture"
 
 AC_PROG_LIBTOOL
 
