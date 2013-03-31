@@ -5,6 +5,10 @@
 #include <xcb/xcb.h>
 #include <xcb/randr.h>
 #include <xcb/xcb_aux.h>
+#include <xcb/xcb_event.h>
+
+// FIXME wrap this state up into an object
+static xcb_connection_t *xcbconn;
 
 static int
 get_xcb_vendor(const xcb_setup_t *xcb){
@@ -42,14 +46,14 @@ int xcb_init(void){
 
 	if((xcb = xcb_connect(NULL,&prefscr)) == NULL){
 		fprintf(stderr,"Couldn't connect to $DISPLAY via XCB\n");
-		return -1;
+		goto err;
 	}
 	if((xcbsetup = xcb_get_setup(xcb)) == NULL){
 		fprintf(stderr,"Couldn't get XCB setup\n");
-		return -1;
+		goto err;
 	}
 	if(get_xcb_vendor(xcbsetup)){
-		return -1;
+		goto err;
 	}
 	xcbfd = xcb_get_file_descriptor(xcb);
 	printf("Connected using XCB protocol %hu.%hu on fd %d\n",
@@ -57,14 +61,14 @@ int xcb_init(void){
 			xcbsetup->protocol_minor_version,xcbfd);
 	if((xscr = xcb_aux_get_screen(xcb,prefscr)) == NULL){
 		fprintf(stderr,"Couldn't get XCB screen info\n");
-		return -1;
+		goto err;
 	}
 	// FIXME from whence these constants? they work like maxima, but
 	// choosing too high a value gets nonsense results...
 	rqvct = xcb_randr_query_version(xcb,256,256);
 	if((rqvrt = xcb_randr_query_version_reply(xcb,rqvct,&xcberr)) == NULL){
 		fprintf(stderr,"Couldn't get XRandR version info\n");
-		return -1;
+		goto err;
 	}
 	free(rqvrt);
 	screenit = xcb_setup_roots_iterator(xcbsetup);
@@ -86,13 +90,14 @@ int xcb_init(void){
 		if((sirt = xcb_randr_get_screen_info_reply(xcb,sict,&xcberr)) == NULL){
 			// FIXME use xcberr
 			fprintf(stderr,"Couldn't get XRandR screen info\n");
-			return -1;
+			goto err;
 		}
 		cursize = sirt->sizeID;
 		numsizes = sirt->nSizes;
 		if((sizes = xcb_randr_get_screen_info_sizes(sirt)) == NULL){
 			fprintf(stderr,"Couldn't get XRandR size info\n");
-			return -1;
+			free(sirt);
+			goto err;
 		}
 		for(z = 0 ; z < numsizes ; ++z){
 			printf("[%02d] %4dx%-4d  ",z,sizes[z].width,sizes[z].height);
@@ -109,5 +114,43 @@ int xcb_init(void){
 		free(sirt);
 		xcb_screen_next(&screenit);
 	}
+	xcb_grab_server(xcb);
+	xcbconn = xcb;
 	return xcbfd;
+
+err:
+	xcb_disconnect(xcb);
+	return -1;
+}
+
+int xcb_poll(void){
+	xcb_generic_event_t *xev;
+	unsigned etype;
+
+	if((xev = xcb_poll_for_event(xcbconn)) == NULL){
+		fprintf(stderr,"Error polling for event\n");
+		return -1;
+	}
+	etype = XCB_EVENT_RESPONSE_TYPE(xev);
+	switch(etype){
+		case XCB_KEY_PRESS:
+			fprintf(stderr,"XCB key press\n");
+			break;
+		case XCB_BUTTON_PRESS:
+			fprintf(stderr,"XCB button press\n");
+			break;
+		case XCB_EXPOSE:
+			fprintf(stderr,"XCB expose\n");
+			break;
+		case XCB_CLIENT_MESSAGE:
+			fprintf(stderr,"XCB client\n");
+			break;
+		case XCB_MAPPING_NOTIFY:
+			fprintf(stderr,"XCB mapping\n");
+			break;
+		default:
+			fprintf(stderr,"unhandled XCB event %d\n",etype);
+			break;
+	}
+	return 0;
 }

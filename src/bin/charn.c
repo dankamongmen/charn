@@ -1,6 +1,7 @@
 #include <xcb.h>
 #include <errno.h>
 #include <stdio.h>
+#include <epoll.h>
 #include <getopt.h>
 #include <stdlib.h>
 #include <locale.h>
@@ -22,9 +23,8 @@ int main(int argc,char **argv){
 		{ "help",	0,	NULL,		'h'	},
 		{ NULL,		0,	NULL,		0	}
 	};
-	int opt,longopt;
+	int opt,longopt,xcbfd;
 	xdgHandle xdg;
-	int xcbfd;
 
 	if((setlocale(LC_ALL,NULL)) == NULL){
 		fprintf(stderr,"Couldn't setlocale(LC_ALL)\n");
@@ -46,6 +46,9 @@ int main(int argc,char **argv){
 	}
 	printf("XDG [cache: %s] [config: %s]\n",xdgCacheHome(&xdg),xdgConfigHome(&xdg));
 	if((xcbfd = xcb_init()) <= 0){
+		return EXIT_FAILURE;
+	}
+	if(event_loop(xcbfd)){
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
