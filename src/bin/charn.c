@@ -1,3 +1,4 @@
+#include <xcb.h>
 #include <errno.h>
 #include <stdio.h>
 #include <getopt.h>
@@ -43,5 +44,8 @@ int main(int argc,char **argv){
 		return EXIT_FAILURE;
 	}
 	printf("XDG [cache: %s] [config: %s]\n",xdgCacheHome(&xdg),xdgConfigHome(&xdg));
+	if(xcb_init()){
+		return EXIT_FAILURE;
+	}
 	return EXIT_SUCCESS;
 }

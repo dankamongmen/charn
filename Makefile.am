@@ -1,10 +1,11 @@
 LANG=C
 LC_ALL=c
 
-AM_CFLAGS=-O2 -Wall -W -Wshadow -Werror -Wextra -fvisibility=hidden \
+AM_CFLAGS=-O2 -Wall -W -Wshadow -Wextra -fvisibility=hidden \
 	  	$(PTHREAD_CFLAGS)
 AM_LDFLAGS=-Wl,-O2,--no-undefined-version,--enable-new-dtags,--as-needed,--warn-common
 AM_CC=$(PTHREAD_CC)
+AM_CPPFLAGS=-I$(SRCDIR)/src/bin
 
 LIBS+=$(PTHREAD_LIBS) 
 
@@ -19,7 +20,7 @@ dist_doc_DATA+=COPYING charn.xhtml
 
 bin_PROGRAMS=charn
 
-charn_SOURCES = src/bin/charn.c
+charn_SOURCES = src/bin/charn.c src/bin/xcb.c
 
 %.1: $(doc_DIR)/man/man1/%.xml $(doc_DIR)/@PACKAGE_NAME@.ent
 	$(XSLTPROC) --path $(doc_DIR) -o $@ --nonet /usr/share/xml/docbook/stylesheet/docbook-xsl/manpages/docbook.xsl $<
