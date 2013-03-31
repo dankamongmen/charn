@@ -7,28 +7,34 @@
 #include <signal.h>
 #include <sys/epoll.h>
 
-static void
-xcbcb(void){
-	xcb_poll();
+// FIXME make a real singleton
+static int eqfd = -1;
+
+int add_event_fd(int fd,void (*cb)(void)){
+	struct epoll_event ev;
+
+	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLPRI | EPOLLET;
+	ev.data.ptr = cb;
+	if(epoll_ctl(eqfd,EPOLL_CTL_ADD,fd,&ev)){
+		fprintf(stderr,"Couldn't set up epoll for %d (%s)\n",fd,strerror(errno));
+		return -1;
+	}
+	return 0;
 }
 
-int event_loop(int xcbfd){
-	struct epoll_event xcbev;
-	int eqfd,e,err;
-	sigset_t ss;
-
-	sigemptyset(&ss);
+int event_init(void){
 	if((eqfd = epoll_create1(EPOLL_CLOEXEC)) <= 0){
 		fprintf(stderr,"Couldn't get epoll fd (%s)\n",strerror(errno));
 		return -1;
 	}
-	xcbev.events = EPOLLIN | EPOLLRDHUP | EPOLLPRI | EPOLLET;
-	xcbev.data.ptr = xcbcb;
-	if(epoll_ctl(eqfd,EPOLL_CTL_ADD,xcbfd,&xcbev)){
-		fprintf(stderr,"Couldn't set up XCB for epoll (%s)\n",strerror(errno));
-		close(eqfd);
-		return -1;
-	}
+	return 0;
+}
+
+int event_loop(void){
+	sigset_t ss;
+	int e,err;
+
+	sigemptyset(&ss);
 	fprintf(stderr,"Entering main event loop (Linux epoll, fd %d)...\n",eqfd);
 	do{
 		struct epoll_event events[10];
@@ -48,5 +54,6 @@ int event_loop(int xcbfd){
 		fprintf(stderr,"Error closing epoll fd (%s)\n",strerror(errno));
 		return -1;
 	}
+	eqfd = -1;
 	return 0;
 }

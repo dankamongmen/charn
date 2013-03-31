@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdio.h>
+#include <epoll.h>
 #include <stdlib.h>
 #include <string.h>
 #include <xcb/xcb.h>
@@ -28,6 +29,11 @@ get_xcb_vendor(const xcb_setup_t *xcb){
 	printf("X server vendor: %s\n",vend);
 	free(vend);
 	return 0;
+}
+
+static void
+xcbcb(void){
+	xcb_poll();
 }
 
 int xcb_init(void){
@@ -114,9 +120,11 @@ int xcb_init(void){
 		free(sirt);
 		xcb_screen_next(&screenit);
 	}
-	xcb_grab_server(xcb);
+	if(add_event_fd(xcbfd,xcbcb)){
+		goto err;
+	}
 	xcbconn = xcb;
-	return xcbfd;
+	return 0;
 
 err:
 	xcb_disconnect(xcb);

@@ -34,11 +34,14 @@ dbus_connect(DBusBusType bustype,const char *name,dbuscb cb,int *fd){
 	dbus_connection_set_exit_on_disconnect(c,0); // seriously?!?
 	if(dbus_connection_get_unix_fd(c,fd) == 0){
 		fprintf(stderr,"Extracting %s D-Bus fd: %s\n",name,err.message);
-		dbus_error_free(&err);
+		dbus_error_free(&err); // FIXME disconnect?
 		return NULL;
 	}
 	printf("DBus[%s] at fd %d%s\n",name,*fd,dbus_bus_get_unique_name(c));
 	dbus_error_free(&err);
+	if(add_event_fd(*fd,cb)){ // FIXME disconnect?
+		return NULL;
+	}
 	return c;
 }	
 

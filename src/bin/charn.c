@@ -24,7 +24,7 @@ int main(int argc,char **argv){
 		{ "help",	0,	NULL,		'h'	},
 		{ NULL,		0,	NULL,		0	}
 	};
-	int opt,longopt,xcbfd;
+	int opt,longopt;
 	xdgHandle xdg;
 
 	if((setlocale(LC_ALL,NULL)) == NULL){
@@ -46,13 +46,16 @@ int main(int argc,char **argv){
 		return EXIT_FAILURE;
 	}
 	printf("XDG [cache: %s] [config: %s]\n",xdgCacheHome(&xdg),xdgConfigHome(&xdg));
-	if((xcbfd = xcb_init()) <= 0){
+	if(event_init()){
+		return EXIT_FAILURE;
+	}
+	if(xcb_init()){
 		return EXIT_FAILURE;
 	}
 	if(dbus_init()){
 		return EXIT_FAILURE;
 	}
-	if(event_loop(xcbfd)){
+	if(event_loop()){
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
