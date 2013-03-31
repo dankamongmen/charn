@@ -35,6 +35,10 @@ PKG_CHECK_MODULES(GLEW, glew, [have_glew=yes])
 	CFLAGS+=" $GLEW_CFLAGS"
 	LIBS+=" $GLEW_LIBS"
 
+PKG_CHECK_MODULES(XDGBASEDIR, libxdg-basedir, [have_xdg_basedir=yes])
+	CFLAGS+=" $XDGBASEDIR_CFLAGS"
+	LIBS+=" $XDGBASEDIR_LIBS"
+
 PKG_CHECK_MODULES(XCBAUX, xcb-aux, [have_xcb_aux=yes])
 	CFLAGS+=" $XCBAUX_CFLAGS"
 	LIBS+=" $XCBAUX_LIBS"

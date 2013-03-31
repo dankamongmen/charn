@@ -8,7 +8,7 @@ by Nick Black (nick.black@sprezzatech.com)
 >the whips and the groaning of slaves, the thunder of chariots, and the
 >sacrificial drums beating in the temples. I have stood here (but that was near
 >the end) when the roar of battle went up from every street and the river of
->Charn ran red. All in one moment one woman blotted it out for ever.
+>Charn ran red. All in one moment one woman blotted it out forever.
 >
 > C.S. Lewis, *The Magician's Newphew*
 
@@ -18,6 +18,8 @@ by Nick Black (nick.black@sprezzatech.com)
 * OpenGL
 * GLEW (www.opengl.org/sdk/libs/GLEW/)
 * GLUT (www.opengl.org/resources/libraries/glut/)
+* XDG-basedir
+* XCB
 
 ## Reading
 
