@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +49,16 @@ int xcb_init(void){
 			rqvrt->major_version,rqvrt->minor_version
 			,screenit.rem,screenit.rem == 1 ? "" : "s");
 	for(z = 0 ; z < scrcount ; ++z){
+		float diag;
+
 		sict = xcb_randr_get_screen_info(xcb,screenit.data->root);
+		diag = sqrt((unsigned long)screenit.data->width_in_millimeters * screenit.data->width_in_millimeters +
+			(unsigned long)screenit.data->height_in_millimeters * screenit.data->height_in_millimeters);
+		printf("Screen %d %hux%humm, %.2fmm diag (%.2fx%.2fin, %.2fin diag)\n",screenit.index,
+				screenit.data->width_in_millimeters,
+				screenit.data->height_in_millimeters, diag,
+				screenit.data->width_in_millimeters * 0.0394,
+				screenit.data->height_in_millimeters * 0.0394, diag * 0.0394);
 		if((sirt = xcb_randr_get_screen_info_reply(xcb,sict,&xcberr)) == NULL){
 			// FIXME use xcberr
 			fprintf(stderr,"Couldn't get XRandR screen info\n");
