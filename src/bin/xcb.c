@@ -6,6 +6,26 @@
 #include <xcb/randr.h>
 #include <xcb/xcb_aux.h>
 
+static int
+get_xcb_vendor(const xcb_setup_t *xcb){
+	char *vend;
+	int len;
+
+	if((len = xcb_setup_vendor_length(xcb)) <= 0){
+		fprintf(stderr,"Invalid vendor length %d\n",len);
+		return -1;
+	}
+	if((vend = malloc(sizeof(*vend) * (1 + len))) == NULL){
+		fprintf(stderr,"Couldn't allocate %db for vendor string\n",len + 1);
+		return -1;
+	}
+	memcpy(vend,xcb_setup_vendor(xcb),len);
+	vend[len] = '\0';
+	printf("X server vendor: %s\n",vend);
+	free(vend);
+	return 0;
+}
+
 int xcb_init(void){
 	xcb_randr_get_screen_info_cookie_t sict;
 	xcb_randr_get_screen_info_reply_t *sirt;
@@ -22,25 +42,29 @@ int xcb_init(void){
 
 	if((xcb = xcb_connect(NULL,&prefscr)) == NULL){
 		fprintf(stderr,"Couldn't connect to $DISPLAY via XCB\n");
-		return EXIT_FAILURE;
+		return -1;
 	}
 	if((xcbsetup = xcb_get_setup(xcb)) == NULL){
 		fprintf(stderr,"Couldn't get XCB setup\n");
-		return EXIT_FAILURE;
+		return -1;
 	}
-	printf("Connected using XCB protocol %hu.%hu\n",
+	if(get_xcb_vendor(xcbsetup)){
+		return -1;
+	}
+	printf("Connected using XCB protocol %hu.%hu on fd %d\n",
 			xcbsetup->protocol_major_version,
-			xcbsetup->protocol_minor_version);
+			xcbsetup->protocol_minor_version,
+			xcb_get_file_descriptor(xcb));
 	if((xscr = xcb_aux_get_screen(xcb,prefscr)) == NULL){
 		fprintf(stderr,"Couldn't get XCB screen info\n");
-		return EXIT_FAILURE;
+		return -1;
 	}
 	// FIXME from whence these constants? they work like maxima, but
 	// choosing too high a value gets nonsense results...
 	rqvct = xcb_randr_query_version(xcb,256,256);
 	if((rqvrt = xcb_randr_query_version_reply(xcb,rqvct,&xcberr)) == NULL){
 		fprintf(stderr,"Couldn't get XRandR version info\n");
-		return EXIT_FAILURE;
+		return -1;
 	}
 	free(rqvrt);
 	screenit = xcb_setup_roots_iterator(xcbsetup);
@@ -62,13 +86,13 @@ int xcb_init(void){
 		if((sirt = xcb_randr_get_screen_info_reply(xcb,sict,&xcberr)) == NULL){
 			// FIXME use xcberr
 			fprintf(stderr,"Couldn't get XRandR screen info\n");
-			return EXIT_FAILURE;
+			return -1;
 		}
 		cursize = sirt->sizeID;
 		numsizes = sirt->nSizes;
 		if((sizes = xcb_randr_get_screen_info_sizes(sirt)) == NULL){
 			fprintf(stderr,"Couldn't get XRandR size info\n");
-			return EXIT_FAILURE;
+			return -1;
 		}
 		for(z = 0 ; z < numsizes ; ++z){
 			printf("[%02d] %4dx%-4d  ",z,sizes[z].width,sizes[z].height);
