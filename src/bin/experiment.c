@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -15,27 +16,28 @@
 
 static GLuint texid; // texture id of quad
 
+static char buf[30]; // obviously just fucking around
+
 static int
 ftgl_init(void){
 	/* Create a pixmap font from a TrueType file. */
 	FTGLfont *font = ftglCreatePixmapFont("/usr/share/fonts/FreeSans.ttf");
 
-	/* If something went wrong, bail out. */
-	if(!font)
-		return -1;
+	assert(font);
 
 	/* Set the font size and render a small text. */
+	glColor4f(1, 0, 0, 1);
 	ftglSetFontFaceSize(font, 72, 72);
-	ftglRenderFont(font, "Hello World!", FTGL_RENDER_ALL);
+	ftglRenderFont(font, buf, FTGL_RENDER_ALL);
 
 	/* Destroy the font object. */
 	ftglDestroyFont(font);
 	return 0;
 }
- 
+
 static void
 onDisplay(void){
-	//glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	if(texid){
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_DECAL);
@@ -59,8 +61,19 @@ onDisplay(void){
 }
 
 static void
+keyhandler(unsigned char key,int x,int y){
+	if(key == 'q'){
+		exit(0);
+	}
+	snprintf(buf,sizeof(buf),"(%d) %c %d %d",key,key,x,y);
+	printf("[%s]\n",buf);
+	onDisplay();
+}
+ 
+static void
 resizecb(int width,int height){
 	printf("GLUT resize event (%dx%d)\n",width,height);
+	snprintf(buf,sizeof(buf),"%dx%d",width,height);
 	glViewport(0,0,(GLsizei)width,(GLsizei)height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -75,7 +88,7 @@ gl_init(void){
 		GL_VENDOR,
 		GL_RENDERER,
 		GL_VERSION,
-		//GL_EXTENSIONS
+		//GL_EXTENSIONS removed in 3.0
 	},t;
 	int maj,min;
 
@@ -172,6 +185,7 @@ int main(int argc,char **argv){
 	printf("Screen size ID: %d/%d (%dx%d)\n",cursize,numsizes,curgeom.width,curgeom.height);
 	glutInitWindowSize(curgeom.width / 2,curgeom.height / 2);
 	glutInitWindowPosition(0,0);
+	glutKeyboardFunc(keyhandler);
 	glutCreateWindow("Charn");
 	if(gl_init()){
 		fprintf(stderr,"Error getting OpenGL version info\n");
@@ -194,4 +208,3 @@ int main(int argc,char **argv){
 	xcb_disconnect(xcb);
 	return EXIT_SUCCESS;
 }
-
