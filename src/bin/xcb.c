@@ -37,8 +37,8 @@ int xcb_init(void){
 	const xcb_setup_t *xcbsetup;
 	xcb_generic_error_t *xcberr;
 	xcb_connection_t *xcb;
+	int z,scrcount,xcbfd;
 	xcb_screen_t *xscr;
-	int z,scrcount;
 
 	if((xcb = xcb_connect(NULL,&prefscr)) == NULL){
 		fprintf(stderr,"Couldn't connect to $DISPLAY via XCB\n");
@@ -51,10 +51,10 @@ int xcb_init(void){
 	if(get_xcb_vendor(xcbsetup)){
 		return -1;
 	}
+	xcbfd = xcb_get_file_descriptor(xcb);
 	printf("Connected using XCB protocol %hu.%hu on fd %d\n",
 			xcbsetup->protocol_major_version,
-			xcbsetup->protocol_minor_version,
-			xcb_get_file_descriptor(xcb));
+			xcbsetup->protocol_minor_version,xcbfd);
 	if((xscr = xcb_aux_get_screen(xcb,prefscr)) == NULL){
 		fprintf(stderr,"Couldn't get XCB screen info\n");
 		return -1;
@@ -104,8 +104,10 @@ int xcb_init(void){
 			printf("\n");
 		}
 		memcpy(&curgeom,sizes + cursize,sizeof(curgeom));
+		printf("Screen size ID: %02d/%02d (%dx%d)\n",cursize,numsizes - 1,
+				curgeom.width,curgeom.height);
 		free(sirt);
 		xcb_screen_next(&screenit);
 	}
-	return 0;
+	return xcbfd;
 }

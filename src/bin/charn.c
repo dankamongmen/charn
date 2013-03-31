@@ -24,6 +24,7 @@ int main(int argc,char **argv){
 	};
 	int opt,longopt;
 	xdgHandle xdg;
+	int xcbfd;
 
 	if((setlocale(LC_ALL,NULL)) == NULL){
 		fprintf(stderr,"Couldn't setlocale(LC_ALL)\n");
@@ -44,7 +45,7 @@ int main(int argc,char **argv){
 		return EXIT_FAILURE;
 	}
 	printf("XDG [cache: %s] [config: %s]\n",xdgCacheHome(&xdg),xdgConfigHome(&xdg));
-	if(xcb_init()){
+	if((xcbfd = xcb_init()) <= 0){
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;

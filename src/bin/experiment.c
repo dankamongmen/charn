@@ -182,7 +182,7 @@ int main(int argc,char **argv){
 	free(sirt);
 	glutInit(&argc,argv);
 	glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE|GLUT_DEPTH);
-	printf("Screen size ID: %d/%d (%dx%d)\n",cursize,numsizes,curgeom.width,curgeom.height);
+	printf("Screen size ID: %02d/%02d (%dx%d)\n",cursize,numsizes - 1,curgeom.width,curgeom.height);
 	glutInitWindowSize(curgeom.width / 2,curgeom.height / 2);
 	glutInitWindowPosition(0,0);
 	glutKeyboardFunc(keyhandler);
