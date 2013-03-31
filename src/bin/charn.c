@@ -1,4 +1,5 @@
 #include <xcb.h>
+#include <dbus.h>
 #include <errno.h>
 #include <stdio.h>
 #include <epoll.h>
@@ -46,6 +47,9 @@ int main(int argc,char **argv){
 	}
 	printf("XDG [cache: %s] [config: %s]\n",xdgCacheHome(&xdg),xdgConfigHome(&xdg));
 	if((xcbfd = xcb_init()) <= 0){
+		return EXIT_FAILURE;
+	}
+	if(dbus_init()){
 		return EXIT_FAILURE;
 	}
 	if(event_loop(xcbfd)){

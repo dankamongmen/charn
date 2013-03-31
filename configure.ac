@@ -26,6 +26,10 @@ LIBS+=${GLUT_LIBS}
 
 AC_CHECK_LIB([m],[sqrt])
 
+PKG_CHECK_MODULES(DBUS, dbus-1, [have_dbus=yes])
+	CFLAGS+=" $DBUS_CFLAGS"
+	LIBS+=" $DBUS_LIBS"
+
 PKG_CHECK_MODULES(FREETYPE, freetype2, [have_freetype2=yes])
 	CFLAGS+=" $FREETYPE_CFLAGS"
 	LIBS+=" $FREETYPE_LIBS"
