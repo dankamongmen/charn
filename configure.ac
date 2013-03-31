@@ -50,6 +50,10 @@ PKG_CHECK_MODULES(XCBAUX, xcb-aux, [have_xcb_aux=yes])
 	CFLAGS+=" $XCBAUX_CFLAGS"
 	LIBS+=" $XCBAUX_LIBS"
 
+PKG_CHECK_MODULES(XCBKEYSYMS, xcb-keysyms, [have_xcb_keysyms=yes])
+	CFLAGS+=" $XCBKEYSYMS_CFLAGS"
+	LIBS+=" $XCBKEYSYMS_LIBS"
+
 PKG_CHECK_MODULES(XCBRANDR, xcb-randr, [have_xcb_randr=yes])
 	CFLAGS+=" $XCBRANDR_CFLAGS"
 	LIBS+=" $XCBRANDR_LIBS"

@@ -7,6 +7,7 @@
 #include <xcb/randr.h>
 #include <xcb/xcb_aux.h>
 #include <xcb/xcb_event.h>
+#include <xcb/xcb_keysyms.h>
 
 // FIXME wrap this state up into an object
 static xcb_connection_t *xcbconn;
@@ -28,6 +29,70 @@ get_xcb_vendor(const xcb_setup_t *xcb){
 	vend[len] = '\0';
 	printf("X server vendor: %s\n",vend);
 	free(vend);
+	return 0;
+}
+
+static int
+xcb_poll(void){
+	xcb_generic_event_t *xev;
+	unsigned etype;
+
+	if((xev = xcb_poll_for_event(xcbconn)) == NULL){
+		fprintf(stderr,"Error polling for event\n");
+		return -1;
+	}
+	etype = XCB_EVENT_RESPONSE_TYPE(xev);
+	switch(etype){
+		case XCB_KEY_PRESS:{
+			xcb_key_press_event_t *ev = (xcb_key_press_event_t *)xev;
+			xcb_key_symbols_t *syms;
+			xcb_keysym_t sym;
+
+			// FIXME all very experimental!
+			if((syms = xcb_key_symbols_alloc(xcbconn)) == NULL){
+				fprintf(stderr,"Couldn't allocate key symbols\n");
+			}else if((sym = xcb_key_press_lookup_keysym(syms,ev,0)) == NULL){
+				fprintf(stderr,"Couldn't translate keycode %d\n",ev->detail);
+			}else{
+				printf("GOT KEYSYM?\n");
+			}
+			xcb_key_symbols_free(syms);
+			break;
+		}case XCB_KEY_RELEASE:{
+			xcb_key_release_event_t *ev = (xcb_key_release_event_t *)xev;
+			xcb_key_symbols_t *syms;
+			xcb_keysym_t sym;
+
+			// FIXME all very experimental!
+			if((syms = xcb_key_symbols_alloc(xcbconn)) == NULL){
+				fprintf(stderr,"Couldn't allocate key symbols\n");
+			}else if((sym = xcb_key_release_lookup_keysym(syms,ev,0)) == NULL){
+				fprintf(stderr,"Couldn't translate keycode %d\n",ev->detail);
+			}else{
+				printf("GOT KEYSYM?\n");
+			}
+			xcb_key_symbols_free(syms);
+			break;
+		}case XCB_BUTTON_PRESS:
+			fprintf(stderr,"XCB button press\n");
+			break;
+		case XCB_EXPOSE:
+			fprintf(stderr,"XCB expose\n");
+			break;
+		case XCB_CLIENT_MESSAGE:
+			fprintf(stderr,"XCB client\n");
+			break;
+		case XCB_MAPPING_NOTIFY:
+			fprintf(stderr,"XCB mapping\n");
+			break;
+		case XCB_MOTION_NOTIFY:
+			fprintf(stderr,"XCB motion\n");
+			break;
+		default:
+			fprintf(stderr,"unhandled XCB event %d\n",etype);
+			break;
+	}
+	free(xev);
 	return 0;
 }
 
@@ -83,6 +148,11 @@ int xcb_init(void){
 			rqvrt->major_version,rqvrt->minor_version
 			,screenit.rem,screenit.rem == 1 ? "" : "s");
 	for(z = 0 ; z < scrcount ; ++z){
+		xcb_void_cookie_t cwin,cmap;
+		xcb_generic_error_t *xerr;
+		uint32_t values[2];
+		xcb_window_t wid;
+		uint32_t mask;
 		float diag;
 
 		sict = xcb_randr_get_screen_info(xcb,screenit.data->root);
@@ -118,8 +188,35 @@ int xcb_init(void){
 		printf("Screen size ID: %02d/%02d (%dx%d)\n",cursize,numsizes - 1,
 				curgeom.width,curgeom.height);
 		free(sirt);
+		mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+		values[0] = screenit.data->white_pixel;
+		values[1] = XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_BUTTON_PRESS |
+			    XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_POINTER_MOTION |
+			    XCB_EVENT_MASK_KEY_PRESS;
+		wid = xcb_generate_id(xcb);
+		cwin = xcb_create_window_checked(xcb,
+				XCB_COPY_FROM_PARENT,
+				wid,
+				screenit.data->root,
+				0, 0,
+				curgeom.width, curgeom.height,
+				0,
+				XCB_WINDOW_CLASS_INPUT_OUTPUT,
+				screenit.data->root_visual,
+				mask, values);
+		cmap = xcb_map_window_checked(xcb,wid);
+		if((xerr = xcb_request_check(xcb,cwin)) || (xerr = xcb_request_check(xcb,cmap))){
+			fprintf(stderr,"Error mapping root window (%d)\n",xerr->error_code);
+			goto err;
+		}
+		values[0] = XCB_STACK_MODE_ABOVE;
+		xcb_configure_window(xcb, wid, XCB_CONFIG_WINDOW_STACK_MODE, values);
+		xcb_set_input_focus(xcb,XCB_INPUT_FOCUS_PARENT,wid,XCB_CURRENT_TIME);
 		xcb_screen_next(&screenit);
 	}
+	xcb_grab_server(xcb);
+	xcb_grab_keyboard(xcb,1,screenit.data->root,XCB_CURRENT_TIME,
+			XCB_GRAB_MODE_ASYNC,XCB_GRAB_MODE_ASYNC);
 	if(add_event_fd(xcbfd,xcbcb)){
 		goto err;
 	}
@@ -129,36 +226,4 @@ int xcb_init(void){
 err:
 	xcb_disconnect(xcb);
 	return -1;
-}
-
-int xcb_poll(void){
-	xcb_generic_event_t *xev;
-	unsigned etype;
-
-	if((xev = xcb_poll_for_event(xcbconn)) == NULL){
-		fprintf(stderr,"Error polling for event\n");
-		return -1;
-	}
-	etype = XCB_EVENT_RESPONSE_TYPE(xev);
-	switch(etype){
-		case XCB_KEY_PRESS:
-			fprintf(stderr,"XCB key press\n");
-			break;
-		case XCB_BUTTON_PRESS:
-			fprintf(stderr,"XCB button press\n");
-			break;
-		case XCB_EXPOSE:
-			fprintf(stderr,"XCB expose\n");
-			break;
-		case XCB_CLIENT_MESSAGE:
-			fprintf(stderr,"XCB client\n");
-			break;
-		case XCB_MAPPING_NOTIFY:
-			fprintf(stderr,"XCB mapping\n");
-			break;
-		default:
-			fprintf(stderr,"unhandled XCB event %d\n",etype);
-			break;
-	}
-	return 0;
 }
