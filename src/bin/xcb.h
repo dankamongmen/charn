@@ -1,6 +1,8 @@
 #ifndef CHARN_XCB
 #define CHARN_XCB
 
-int xcb_init(void);
+#include <X11/Xlib.h>
+
+int xcb_init(Display *);
 
 #endif

@@ -4,8 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <xcb/xcb.h>
+#include <X11/Xlib.h>
 #include <xcb/randr.h>
 #include <xcb/xcb_aux.h>
+#include <X11/Xlib-xcb.h>
 #include <xcb/xcb_event.h>
 #include <xcb/xcb_keysyms.h>
 
@@ -51,7 +53,7 @@ xcb_poll(void){
 			// FIXME all very experimental!
 			if((syms = xcb_key_symbols_alloc(xcbconn)) == NULL){
 				fprintf(stderr,"Couldn't allocate key symbols\n");
-			}else if((sym = xcb_key_press_lookup_keysym(syms,ev,0)) == NULL){
+			}else if(!(sym = xcb_key_press_lookup_keysym(syms,ev,0))){
 				fprintf(stderr,"Couldn't translate keycode %d\n",ev->detail);
 			}else{
 				printf("GOT KEYSYM?\n");
@@ -66,7 +68,7 @@ xcb_poll(void){
 			// FIXME all very experimental!
 			if((syms = xcb_key_symbols_alloc(xcbconn)) == NULL){
 				fprintf(stderr,"Couldn't allocate key symbols\n");
-			}else if((sym = xcb_key_release_lookup_keysym(syms,ev,0)) == NULL){
+			}else if(!(sym = xcb_key_release_lookup_keysym(syms,ev,0))){
 				fprintf(stderr,"Couldn't translate keycode %d\n",ev->detail);
 			}else{
 				printf("GOT KEYSYM?\n");
@@ -101,7 +103,7 @@ xcbcb(void){
 	xcb_poll();
 }
 
-int xcb_init(void){
+int xcb_init(Display *disp){
 	xcb_randr_get_screen_info_cookie_t sict;
 	xcb_randr_get_screen_info_reply_t *sirt;
 	xcb_randr_query_version_cookie_t rqvct;
@@ -115,7 +117,12 @@ int xcb_init(void){
 	int z,scrcount,xcbfd;
 	xcb_screen_t *xscr;
 
-	if((xcb = xcb_connect(NULL,&prefscr)) == NULL){
+	if(disp){ // mixed X11+XCB mode
+		if((xcb = XGetXCBConnection(disp)) == NULL){
+			fprintf(stderr,"Couldn't extract XCB connection from X11\n");
+			goto err;
+		}
+	}else if((xcb = xcb_connect(NULL,&prefscr)) == NULL){
 		fprintf(stderr,"Couldn't connect to $DISPLAY via XCB\n");
 		goto err;
 	}
@@ -138,13 +145,13 @@ int xcb_init(void){
 	// choosing too high a value gets nonsense results...
 	rqvct = xcb_randr_query_version(xcb,256,256);
 	if((rqvrt = xcb_randr_query_version_reply(xcb,rqvct,&xcberr)) == NULL){
-		fprintf(stderr,"Couldn't get XRandR version info\n");
+		fprintf(stderr,"Couldn't get XCB-XRandR version info\n");
 		goto err;
 	}
 	free(rqvrt);
 	screenit = xcb_setup_roots_iterator(xcbsetup);
 	scrcount = screenit.rem;
-	printf("Connected using XRandR protocol %d.%d (%d screen%s)\n",
+	printf("Connected using XCB-XRandR protocol %d.%d (%d screen%s)\n",
 			rqvrt->major_version,rqvrt->minor_version
 			,screenit.rem,screenit.rem == 1 ? "" : "s");
 	for(z = 0 ; z < scrcount ; ++z){
@@ -165,13 +172,13 @@ int xcb_init(void){
 				screenit.data->height_in_millimeters * 0.0394, diag * 0.0394);
 		if((sirt = xcb_randr_get_screen_info_reply(xcb,sict,&xcberr)) == NULL){
 			// FIXME use xcberr
-			fprintf(stderr,"Couldn't get XRandR screen info\n");
+			fprintf(stderr,"Couldn't get XCB-XRandR screen info\n");
 			goto err;
 		}
 		cursize = sirt->sizeID;
 		numsizes = sirt->nSizes;
 		if((sizes = xcb_randr_get_screen_info_sizes(sirt)) == NULL){
-			fprintf(stderr,"Couldn't get XRandR size info\n");
+			fprintf(stderr,"Couldn't get XCB-XRandR size info\n");
 			free(sirt);
 			goto err;
 		}

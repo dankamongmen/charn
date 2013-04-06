@@ -1,4 +1,6 @@
+#include <xi2.h>
 #include <xcb.h>
+#include <xdg.h>
 #include <dbus.h>
 #include <errno.h>
 #include <stdio.h>
@@ -24,6 +26,7 @@ int main(int argc,char **argv){
 		{ NULL,		0,	NULL,		0	}
 	};
 	int opt,longopt;
+	Display *dpy;
 
 	if((setlocale(LC_ALL,NULL)) == NULL){
 		fprintf(stderr,"Couldn't setlocale(LC_ALL)\n");
@@ -39,10 +42,17 @@ int main(int argc,char **argv){
 				break;
 		}
 	}
+	if((dpy = XOpenDisplay(NULL)) == NULL){
+		fprintf(stderr,"Couldn't open connection to X11 server\n");
+		return EXIT_FAILURE;
+	}
 	if(event_init()){
 		return EXIT_FAILURE;
 	}
-	if(xcb_init()){
+	if(xcb_init(NULL)){
+		return EXIT_FAILURE;
+	}
+	if(init_xi2(dpy)){
 		return EXIT_FAILURE;
 	}
 	if(dbus_init()){

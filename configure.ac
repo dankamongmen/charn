@@ -26,6 +26,14 @@ LIBS+=${GLUT_LIBS}
 
 AC_CHECK_LIB([m],[sqrt])
 
+PKG_CHECK_MODULES(X11, x11, [have_x11=yes])
+	CFLAGS+=" $X11_CFLAGS"
+	LIBS+=" $X11_LIBS"
+
+PKG_CHECK_MODULES(X11XCB, x11-xcb, [have_x11_xcb=yes])
+	CFLAGS+=" $X11XCB_CFLAGS"
+	LIBS+=" $X11XCB_LIBS"
+
 PKG_CHECK_MODULES(DBUS, dbus-1, [have_dbus=yes])
 	CFLAGS+=" $DBUS_CFLAGS"
 	LIBS+=" $DBUS_LIBS"
@@ -42,10 +50,6 @@ PKG_CHECK_MODULES(GLEW, glew, [have_glew=yes])
 	CFLAGS+=" $GLEW_CFLAGS"
 	LIBS+=" $GLEW_LIBS"
 
-PKG_CHECK_MODULES(XDGBASEDIR, libxdg-basedir, [have_xdg_basedir=yes])
-	CFLAGS+=" $XDGBASEDIR_CFLAGS"
-	LIBS+=" $XDGBASEDIR_LIBS"
-
 PKG_CHECK_MODULES(XCBAUX, xcb-aux, [have_xcb_aux=yes])
 	CFLAGS+=" $XCBAUX_CFLAGS"
 	LIBS+=" $XCBAUX_LIBS"
@@ -57,6 +61,10 @@ PKG_CHECK_MODULES(XCBKEYSYMS, xcb-keysyms, [have_xcb_keysyms=yes])
 PKG_CHECK_MODULES(XCBRANDR, xcb-randr, [have_xcb_randr=yes])
 	CFLAGS+=" $XCBRANDR_CFLAGS"
 	LIBS+=" $XCBRANDR_LIBS"
+
+PKG_CHECK_MODULES(XDGBASEDIR, libxdg-basedir, [have_xdg_basedir=yes])
+	CFLAGS+=" $XDGBASEDIR_CFLAGS"
+	LIBS+=" $XDGBASEDIR_LIBS"
 
 AC_SEARCH_LIBS([SOIL_load_OGL_texture],[SOIL],[],AC_MSG_ERROR([Cannot find libsoil.]))
 LIBS+=" $ac_cv_search_SOIL_load_OGL_texture"
