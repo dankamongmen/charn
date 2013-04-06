@@ -1,3 +1,4 @@
+#include <x11.h>
 #include <xi2.h>
 #include <xcb.h>
 #include <xdg.h>
@@ -42,8 +43,7 @@ int main(int argc,char **argv){
 				break;
 		}
 	}
-	if((dpy = XOpenDisplay(NULL)) == NULL){
-		fprintf(stderr,"Couldn't open connection to X11 server\n");
+	if((dpy = init_x11()) == NULL){
 		return EXIT_FAILURE;
 	}
 	if(event_init()){

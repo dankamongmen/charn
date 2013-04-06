@@ -21,7 +21,7 @@ dist_doc_DATA+=COPYING charn.xhtml
 bin_PROGRAMS=charn
 
 charn_SOURCES = src/bin/charn.c src/bin/dbus.c src/bin/epoll.c src/bin/xcb.c \
-	src/bin/xdg.c src/bin/xi2.c
+	src/bin/xdg.c src/bin/xi2.c src/bin/x11.c
 
 %.1: $(doc_DIR)/man/man1/%.xml $(doc_DIR)/@PACKAGE_NAME@.ent
 	$(XSLTPROC) --path $(doc_DIR) -o $@ --nonet /usr/share/xml/docbook/stylesheet/docbook-xsl/manpages/docbook.xsl $<

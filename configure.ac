@@ -34,6 +34,10 @@ PKG_CHECK_MODULES(X11XCB, x11-xcb, [have_x11_xcb=yes])
 	CFLAGS+=" $X11XCB_CFLAGS"
 	LIBS+=" $X11XCB_LIBS"
 
+PKG_CHECK_MODULES(XI, xi, [have_xi=yes])
+	CFLAGS+=" $XI_CFLAGS"
+	LIBS+=" $XI_LIBS"
+
 PKG_CHECK_MODULES(DBUS, dbus-1, [have_dbus=yes])
 	CFLAGS+=" $DBUS_CFLAGS"
 	LIBS+=" $DBUS_LIBS"
