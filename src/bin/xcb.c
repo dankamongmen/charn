@@ -190,9 +190,7 @@ int xcb_init(void){
 		free(sirt);
 		mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
 		values[0] = screenit.data->white_pixel;
-		values[1] = XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_BUTTON_PRESS |
-			    XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_POINTER_MOTION |
-			    XCB_EVENT_MASK_KEY_PRESS;
+		values[1] = XCB_EVENT_MASK_EXPOSURE;
 		wid = xcb_generate_id(xcb);
 		cwin = xcb_create_window_checked(xcb,
 				XCB_COPY_FROM_PARENT,
@@ -211,12 +209,12 @@ int xcb_init(void){
 		}
 		values[0] = XCB_STACK_MODE_ABOVE;
 		xcb_configure_window(xcb, wid, XCB_CONFIG_WINDOW_STACK_MODE, values);
-		xcb_set_input_focus(xcb,XCB_INPUT_FOCUS_PARENT,wid,XCB_CURRENT_TIME);
+		//xcb_set_input_focus(xcb,XCB_INPUT_FOCUS_PARENT,wid,XCB_CURRENT_TIME);
 		xcb_screen_next(&screenit);
 	}
 	xcb_grab_server(xcb);
-	xcb_grab_keyboard(xcb,1,screenit.data->root,XCB_CURRENT_TIME,
-			XCB_GRAB_MODE_ASYNC,XCB_GRAB_MODE_ASYNC);
+	/*xcb_grab_keyboard(xcb,1,screenit.data->root,XCB_CURRENT_TIME,
+			XCB_GRAB_MODE_ASYNC,XCB_GRAB_MODE_ASYNC);*/
 	if(add_event_fd(xcbfd,xcbcb)){
 		goto err;
 	}

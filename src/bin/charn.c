@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <string.h>
-#include <basedir.h>
 
 static void
 usage(const char *name,int status){
@@ -25,7 +24,6 @@ int main(int argc,char **argv){
 		{ NULL,		0,	NULL,		0	}
 	};
 	int opt,longopt;
-	xdgHandle xdg;
 
 	if((setlocale(LC_ALL,NULL)) == NULL){
 		fprintf(stderr,"Couldn't setlocale(LC_ALL)\n");
@@ -41,11 +39,6 @@ int main(int argc,char **argv){
 				break;
 		}
 	}
-	if(xdgInitHandle(&xdg) == NULL){
-		fprintf(stderr,"Couldn't initialize XDG data cache\n");
-		return EXIT_FAILURE;
-	}
-	printf("XDG [cache: %s] [config: %s]\n",xdgCacheHome(&xdg),xdgConfigHome(&xdg));
 	if(event_init()){
 		return EXIT_FAILURE;
 	}
@@ -55,6 +48,7 @@ int main(int argc,char **argv){
 	if(dbus_init()){
 		return EXIT_FAILURE;
 	}
+	system("gnome-terminal");
 	if(event_loop()){
 		return EXIT_FAILURE;
 	}
