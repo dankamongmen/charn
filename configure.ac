@@ -69,8 +69,6 @@ AX_CHECK_DOCBOOK_XSLT
 
 AC_PROG_LIBTOOL
 
-AC_CONFIG_MACRO_DIR([m4])
-
 SRCDIR=${srcdir}
 
 ## output
