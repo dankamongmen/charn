@@ -34,9 +34,10 @@ PKG_CHECK_MODULES(X11XCB, x11-xcb, [have_x11_xcb=yes])
 	CFLAGS+=" $X11XCB_CFLAGS"
 	LIBS+=" $X11XCB_LIBS"
 
-PKG_CHECK_MODULES(XI, xi, [have_xi=yes])
-	CFLAGS+=" $XI_CFLAGS"
-	LIBS+=" $XI_LIBS"
+# We require at least XI 2.2
+PKG_CHECK_MODULES(XI2, [xi >= 1.5.99.1] [inputproto >= 2.1.99.1], [have_xi=yes])
+	CFLAGS+=" $XI2_CFLAGS"
+	LIBS+=" $XI2_LIBS"
 
 PKG_CHECK_MODULES(DBUS, dbus-1, [have_dbus=yes])
 	CFLAGS+=" $DBUS_CFLAGS"
