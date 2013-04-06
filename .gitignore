@@ -23,6 +23,7 @@ missing
 doc/charn.ent
 src/bin/.deps/
 src/bin/.dirstamp
-src/bin/charn.o
+src/bin/*.o
 config.h
 stamp-h1
+tags
