@@ -2,7 +2,9 @@
 #include <xi2.h>
 #include <xcb.h>
 #include <xdg.h>
+#include <glx.h>
 #include <dbus.h>
+#include <glew.h>
 #include <errno.h>
 #include <stdio.h>
 #include <epoll.h>
@@ -26,6 +28,7 @@ int main(int argc,char **argv){
 		{ "help",	0,	NULL,		'h'	},
 		{ NULL,		0,	NULL,		0	}
 	};
+	xcb_window_t wid;
 	int opt,longopt;
 	Display *dpy;
 
@@ -49,10 +52,16 @@ int main(int argc,char **argv){
 	if(event_init()){
 		return EXIT_FAILURE;
 	}
-	if(xcb_init(NULL)){
+	if((wid = xcb_init(NULL)) == (xcb_window_t)-1){
 		return EXIT_FAILURE;
 	}
 	if(init_xi2(dpy)){
+		return EXIT_FAILURE;
+	}
+	if(init_glx(dpy,wid)){
+		return EXIT_FAILURE;
+	}
+	if(glew_init()){
 		return EXIT_FAILURE;
 	}
 	if(dbus_init()){
