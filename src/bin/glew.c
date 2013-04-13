@@ -5,6 +5,7 @@
 int glew_init(void){
 	GLenum err;
        
+	glewExperimental = GL_TRUE;
 	if((err	= glewInit()) != GLEW_OK){
 		fprintf(stderr,"Error initializing GLEW: %s\n",glewGetErrorString(err));
 		return -1;
