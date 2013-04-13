@@ -103,7 +103,7 @@ xcbcb(void){
 	xcb_poll();
 }
 
-int xcb_init(Display *disp){
+xcb_window_t xcb_init(Display *disp){
 	xcb_randr_get_screen_info_cookie_t sict;
 	xcb_randr_get_screen_info_reply_t *sirt;
 	xcb_randr_query_version_cookie_t rqvct;
@@ -116,6 +116,7 @@ int xcb_init(Display *disp){
 	xcb_connection_t *xcb;
 	int z,scrcount,xcbfd;
 	xcb_screen_t *xscr;
+	xcb_window_t wid;
 
 	if(disp){ // mixed X11+XCB mode
 		if((xcb = XGetXCBConnection(disp)) == NULL){
@@ -154,11 +155,11 @@ int xcb_init(Display *disp){
 	printf("Connected using XCB-XRandR protocol %d.%d (%d screen%s)\n",
 			rqvrt->major_version,rqvrt->minor_version
 			,screenit.rem,screenit.rem == 1 ? "" : "s");
+	wid = (xcb_window_t)-1;
 	for(z = 0 ; z < scrcount ; ++z){
 		xcb_void_cookie_t cwin,cmap;
 		xcb_generic_error_t *xerr;
 		uint32_t values[2];
-		xcb_window_t wid;
 		uint32_t mask;
 		float diag;
 
@@ -198,7 +199,11 @@ int xcb_init(Display *disp){
 		mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
 		values[0] = screenit.data->white_pixel;
 		values[1] = XCB_EVENT_MASK_EXPOSURE;
-		wid = xcb_generate_id(xcb);
+		// FIXME for multiple screens do we want multiple xcb ids?
+		if((wid = xcb_generate_id(xcb)) == (xcb_window_t)-1){
+			fprintf(stderr,"Couldn't generate XCB ID\n");
+			return -1;
+		}
 		cwin = xcb_create_window_checked(xcb,
 				XCB_COPY_FROM_PARENT,
 				wid,
@@ -226,7 +231,7 @@ int xcb_init(Display *disp){
 		goto err;
 	}
 	xcbconn = xcb;
-	return 0;
+	return wid;
 
 err:
 	xcb_disconnect(xcb);
