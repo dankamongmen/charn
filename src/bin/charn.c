@@ -67,7 +67,6 @@ int main(int argc,char **argv){
 	if(dbus_init()){
 		return EXIT_FAILURE;
 	}
-	system("gnome-terminal");
 	if(event_loop()){
 		return EXIT_FAILURE;
 	}
