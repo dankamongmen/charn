@@ -43,7 +43,11 @@ xcb_poll(void){
 	unsigned etype;
 
 	if((xev = xcb_poll_for_event(xcbconn)) == NULL){
-		fprintf(stderr,"Error polling for event\n");
+		if(!xcb_connection_has_error(xcbconn)){
+			fprintf(stderr,"No XCB event was available\n");
+			return 0;
+		}
+		fprintf(stderr,"Connection to X server was lost\n");
 		return -1;
 	}
 	etype = XCB_EVENT_RESPONSE_TYPE(xev);
@@ -101,9 +105,9 @@ xcb_poll(void){
 	return 0;
 }
 
-static void
+static int
 xcbcb(void){
-	xcb_poll();
+	return xcb_poll();
 }
 
 xcb_window_t xcb_init(Display *disp){

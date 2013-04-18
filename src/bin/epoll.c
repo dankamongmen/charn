@@ -10,10 +10,11 @@
 // FIXME make a real singleton
 static int eqfd = -1;
 
-int add_event_fd(int fd,void (*cb)(void)){
+int add_event_fd(int fd,int (*cb)(void)){
 	struct epoll_event ev;
 
-	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLPRI | EPOLLET;
+	// FIXME move to edge-triggered events once basic work is done
+	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLPRI/* | EPOLLET*/;
 	ev.data.ptr = cb;
 	if(epoll_ctl(eqfd,EPOLL_CTL_ADD,fd,&ev)){
 		fprintf(stderr,"Couldn't set up epoll for %d (%s)\n",fd,strerror(errno));
@@ -42,7 +43,9 @@ int event_loop(void){
 		while((e = epoll_pwait(eqfd,events,sizeof(events) / sizeof(*events),-1,&ss)) >= 0){
 			printf("*** %d events ***\n",e);
 			while(e--){
-				((void(*)(void))events[e].data.ptr)();
+				if(((int(*)(void))events[e].data.ptr)()){
+					goto cberror;
+				}
 			}
 		}
 		if((err = errno) != EINTR){
@@ -51,6 +54,7 @@ int event_loop(void){
 			fprintf(stderr,"Poll interrupted by signal\n");
 		}
 	}while(err == EINTR);
+cberror:
 	if(close(eqfd)){
 		fprintf(stderr,"Error closing epoll fd (%s)\n",strerror(errno));
 		return -1;

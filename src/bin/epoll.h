@@ -3,6 +3,6 @@
 
 int event_init(void);
 int event_loop(void);
-int add_event_fd(int,void (*)(void));
+int add_event_fd(int,int (*)(void));
 
 #endif

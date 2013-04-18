@@ -10,16 +10,18 @@ typedef struct dbus_state {
 
 static dbus_state ctx;
 
-typedef void (*dbuscb)(void);
+typedef int (*dbuscb)(void);
 
-static void
+static int
 sessioncb(void){
 	fprintf(stderr,"Session DBus callback\n");
+	return 0;
 }
 
-static void
+static int
 systemcb(void){
 	fprintf(stderr,"System DBus callback\n");
+	return 0;
 }
 
 static DBusConnection *
