@@ -41,7 +41,6 @@ int event_loop(void){
 		struct epoll_event events[10];
 
 		while((e = epoll_pwait(eqfd,events,sizeof(events) / sizeof(*events),-1,&ss)) >= 0){
-			printf("*** %d events ***\n",e);
 			while(e--){
 				if(((int(*)(void))events[e].data.ptr)()){
 					goto cberror;

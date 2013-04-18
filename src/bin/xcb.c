@@ -192,7 +192,7 @@ xcb_window_t xcb_init(Display *disp){
 			goto err;
 		}
 		for(z = 0 ; z < numsizes ; ++z){
-			printf("[%02d] %4dx%-4d  ",z,sizes[z].width,sizes[z].height);
+			printf("[%02d] %4dx%-4d  ",z + 1,sizes[z].width,sizes[z].height);
 			if(z % 4 == 3){
 				printf("\n");
 			}
@@ -201,7 +201,8 @@ xcb_window_t xcb_init(Display *disp){
 			printf("\n");
 		}
 		memcpy(&curgeom,sizes + cursize,sizeof(curgeom));
-		printf("Screen size ID: %02d/%02d (%dx%d) (%.0fx%.0f DPI)\n",cursize,numsizes - 1,
+		printf("Screen geometry ID: %d/%d (%dx%d) (%.0fx%.0f DPI)\n",
+				cursize + 1,numsizes,
 				curgeom.width,curgeom.height,
 				round(curgeom.width / inchw),
 				round(curgeom.height / inchh));
@@ -231,12 +232,12 @@ xcb_window_t xcb_init(Display *disp){
 		}
 		values[0] = XCB_STACK_MODE_ABOVE;
 		xcb_configure_window(xcb, wid, XCB_CONFIG_WINDOW_STACK_MODE, values);
-		//xcb_set_input_focus(xcb,XCB_INPUT_FOCUS_PARENT,wid,XCB_CURRENT_TIME);
+		xcb_set_input_focus(xcb,XCB_INPUT_FOCUS_PARENT,wid,XCB_CURRENT_TIME);
 		xcb_screen_next(&screenit);
 	}
 	xcb_grab_server(xcb);
-	/*xcb_grab_keyboard(xcb,1,screenit.data->root,XCB_CURRENT_TIME,
-			XCB_GRAB_MODE_ASYNC,XCB_GRAB_MODE_ASYNC);*/
+	xcb_grab_keyboard(xcb,1,screenit.data->root,XCB_CURRENT_TIME,
+			XCB_GRAB_MODE_ASYNC,XCB_GRAB_MODE_ASYNC);
 	if(add_event_fd(xcbfd,xcbcb)){
 		goto err;
 	}
