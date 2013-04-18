@@ -29,7 +29,10 @@ get_xcb_vendor(const xcb_setup_t *xcb){
 	}
 	memcpy(vend,xcb_setup_vendor(xcb),len);
 	vend[len] = '\0';
-	printf("X server vendor: %s\n",vend);
+	printf("X server: %s %u.%u.%u\n",vend,
+			xcb->release_number / 10000000u,
+			(xcb->release_number / 100000u) % 100u,
+			xcb->release_number % 100000u);
 	free(vend);
 	return 0;
 }
