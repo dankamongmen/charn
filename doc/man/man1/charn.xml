@@ -57,4 +57,12 @@
 		<refname>&dhpackage;</refname>
 		<refpurpose>Compositing tiling ZUI</refpurpose>
 	</refnamediv>
+	<refsynopsisdiv>
+		<cmdsynopsis>
+			<command>&dhpackage;</command>
+			<arg>-h | --help</arg>
+			<arg>-k | --check</arg>
+			<arg>-c | --config=path</arg>
+		</cmdsynopsis>
+	</refsynopsisdiv>
 </refentry>
