@@ -162,18 +162,19 @@ xcb_window_t xcb_init(Display *disp){
 	for(z = 0 ; z < scrcount ; ++z){
 		xcb_void_cookie_t cwin,cmap;
 		xcb_generic_error_t *xerr;
+		float diag,inchw,inchh;
 		uint32_t values[2];
 		uint32_t mask;
-		float diag;
 
 		sict = xcb_randr_get_screen_info(xcb,screenit.data->root);
 		diag = sqrt((unsigned long)screenit.data->width_in_millimeters * screenit.data->width_in_millimeters +
 			(unsigned long)screenit.data->height_in_millimeters * screenit.data->height_in_millimeters);
+		inchw = screenit.data->width_in_millimeters * 0.0394;
+		inchh = screenit.data->height_in_millimeters * 0.0394;
 		printf("Screen %d %hux%humm, %.2fmm diag (%.2fx%.2fin, %.2fin diag)\n",screenit.index,
 				screenit.data->width_in_millimeters,
 				screenit.data->height_in_millimeters, diag,
-				screenit.data->width_in_millimeters * 0.0394,
-				screenit.data->height_in_millimeters * 0.0394, diag * 0.0394);
+				inchw,inchh,diag * 0.0394);
 		if((sirt = xcb_randr_get_screen_info_reply(xcb,sict,&xcberr)) == NULL){
 			// FIXME use xcberr
 			fprintf(stderr,"Couldn't get XCB-XRandR screen info\n");
@@ -192,12 +193,14 @@ xcb_window_t xcb_init(Display *disp){
 				printf("\n");
 			}
 		}
-		if(z % 4 != 2){
+		if(z % 4){
 			printf("\n");
 		}
 		memcpy(&curgeom,sizes + cursize,sizeof(curgeom));
-		printf("Screen size ID: %02d/%02d (%dx%d)\n",cursize,numsizes - 1,
-				curgeom.width,curgeom.height);
+		printf("Screen size ID: %02d/%02d (%dx%d) (%.0fx%.0f DPI)\n",cursize,numsizes - 1,
+				curgeom.width,curgeom.height,
+				round(curgeom.width / inchw),
+				round(curgeom.height / inchh));
 		free(sirt);
 		mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
 		values[0] = screenit.data->white_pixel;
