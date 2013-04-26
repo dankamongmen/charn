@@ -55,7 +55,7 @@ int main(int argc,char **argv){
 	if((wid = xcb_init(NULL)) == (xcb_window_t)-1){
 		return EXIT_FAILURE;
 	}
-	if(init_xi2(dpy)){
+	if(init_xi2(dpy,wid)){
 		return EXIT_FAILURE;
 	}
 	if(init_glx(dpy,wid)){

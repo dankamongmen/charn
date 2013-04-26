@@ -238,12 +238,12 @@ xcb_window_t xcb_init(Display *disp){
 		}
 		values[0] = XCB_STACK_MODE_ABOVE;
 		xcb_configure_window(xcb, wid, XCB_CONFIG_WINDOW_STACK_MODE, values);
-		xcb_set_input_focus(xcb,XCB_INPUT_FOCUS_PARENT,wid,XCB_CURRENT_TIME);
+		//xcb_set_input_focus(xcb,XCB_INPUT_FOCUS_PARENT,wid,XCB_CURRENT_TIME);
 		xcb_screen_next(&screenit);
 	}
-	xcb_grab_server(xcb);
+	/*xcb_grab_server(xcb);
 	xcb_grab_keyboard(xcb,1,screenit.data->root,XCB_CURRENT_TIME,
-			XCB_GRAB_MODE_ASYNC,XCB_GRAB_MODE_ASYNC);
+			XCB_GRAB_MODE_ASYNC,XCB_GRAB_MODE_ASYNC);*/
 	if(add_event_fd(xcbfd,xcbcb)){
 		goto err;
 	}
