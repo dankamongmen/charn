@@ -29,10 +29,11 @@ get_xcb_vendor(const xcb_setup_t *xcb){
 	}
 	memcpy(vend,xcb_setup_vendor(xcb),len);
 	vend[len] = '\0';
-	printf("X server: %s %u.%u.%u\n",vend,
+	printf("X server: %s %u.%u.%u.%u\n",vend,
 			xcb->release_number / 10000000u,
 			(xcb->release_number / 100000u) % 100u,
-			xcb->release_number % 100000u);
+			(xcb->release_number / 1000u) % 100u,
+			xcb->release_number % 1000u);
 	free(vend);
 	return 0;
 }
@@ -175,7 +176,7 @@ xcb_window_t xcb_init(Display *disp){
 			(unsigned long)screenit.data->height_in_millimeters * screenit.data->height_in_millimeters);
 		inchw = screenit.data->width_in_millimeters * 0.0394;
 		inchh = screenit.data->height_in_millimeters * 0.0394;
-		printf("Screen %d %hux%humm, %.2fmm diag (%.2fx%.2fin, %.2fin diag)\n",screenit.index,
+		printf("Screen %d %hux%humm, %.0fmm diag (%.2fx%.2fin, %.2fin diag)\n",screenit.index,
 				screenit.data->width_in_millimeters,
 				screenit.data->height_in_millimeters, diag,
 				inchw,inchh,diag * 0.0394);
@@ -201,7 +202,7 @@ xcb_window_t xcb_init(Display *disp){
 			printf("\n");
 		}
 		memcpy(&curgeom,sizes + cursize,sizeof(curgeom));
-		printf("Screen geometry ID: %d/%d (%dx%d) (%.0fx%.0f DPI)\n",
+		printf("Using geometry %d/%d (%dx%d) (%.0fx%.0f DPI)\n",
 				cursize + 1,numsizes,
 				curgeom.width,curgeom.height,
 				round(curgeom.width / inchw),
