@@ -6,19 +6,20 @@ static int
 get_glx_vendor(void){
 	const GLubyte *vend,*rend,*ver;
 
-	if((vend = glGetString(GL_VENDOR)) == NULL){
-		fprintf(stderr,"Couldn't get OpenGL vendor\n");
-		return -1;
-	}
 	if((ver = glGetString(GL_VERSION)) == NULL){
 		fprintf(stderr,"Couldn't get OpenGL version\n");
+		return -1;
+	}
+	printf("Using OpenGL: %s\n",ver);
+	if((vend = glGetString(GL_VENDOR)) == NULL){
+		fprintf(stderr,"Couldn't get OpenGL vendor\n");
 		return -1;
 	}
 	if((rend = glGetString(GL_RENDERER)) == NULL){
 		fprintf(stderr,"Couldn't get OpenGL renderer\n");
 		return -1;
 	}
-	printf("OpenGL: %s %s on %s\n",vend,ver,rend);
+	printf("GL server: %s %s\n",vend,rend);
 	return 0;
 }
 

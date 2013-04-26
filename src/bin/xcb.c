@@ -176,9 +176,13 @@ xcb_window_t xcb_init(Display *disp){
 			(unsigned long)screenit.data->height_in_millimeters * screenit.data->height_in_millimeters);
 		inchw = screenit.data->width_in_millimeters * 0.0394;
 		inchh = screenit.data->height_in_millimeters * 0.0394;
-		printf("Screen %d %hux%humm, %.0fmm diag (%.2fx%.2fin, %.2fin diag)\n",screenit.index,
+		printf("Screen %d %hux%humm (%.2f ratio), %.0fmm diag (%.2fx%.2fin, %.2fin diag)\n",
+				screenit.index,
 				screenit.data->width_in_millimeters,
-				screenit.data->height_in_millimeters, diag,
+				screenit.data->height_in_millimeters,
+				(double)screenit.data->width_in_millimeters / 
+				screenit.data->height_in_millimeters,
+				diag,
 				inchw,inchh,diag * 0.0394);
 		if((sirt = xcb_randr_get_screen_info_reply(xcb,sict,&xcberr)) == NULL){
 			// FIXME use xcberr
@@ -202,11 +206,12 @@ xcb_window_t xcb_init(Display *disp){
 			printf("\n");
 		}
 		memcpy(&curgeom,sizes + cursize,sizeof(curgeom));
-		printf("Using geometry %d/%d (%dx%d) (%.0fx%.0f DPI)\n",
+		printf("Using geometry %d/%d (%dx%d) (%.0fx%.0f DPI, %.02f ratio)\n",
 				cursize + 1,numsizes,
 				curgeom.width,curgeom.height,
 				round(curgeom.width / inchw),
-				round(curgeom.height / inchh));
+				round(curgeom.height / inchh),
+				(double)curgeom.width / curgeom.height);
 		free(sirt);
 		mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
 		values[0] = screenit.data->white_pixel;
