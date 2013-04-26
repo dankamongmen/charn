@@ -18,7 +18,7 @@ get_glx_vendor(void){
 		fprintf(stderr,"Couldn't get OpenGL renderer\n");
 		return -1;
 	}
-	printf("GL server: %s %s on %s\n",vend,ver,rend);
+	printf("OpenGL: %s %s on %s\n",vend,ver,rend);
 	return 0;
 }
 
