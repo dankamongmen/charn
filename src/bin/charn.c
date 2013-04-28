@@ -46,6 +46,9 @@ int main(int argc,char **argv){
 				break;
 		}
 	}
+	if(xdg_init()){
+		return EXIT_FAILURE;
+	}
 	if((dpy = init_x11()) == NULL){
 		return EXIT_FAILURE;
 	}

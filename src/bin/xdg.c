@@ -9,6 +9,7 @@ int xdg_init(void){
 		fprintf(stderr,"Couldn't initialize XDG data cache\n");
 		return -1;
 	}
-	printf("XDG [cache: %s] [config: %s]\n",xdgCacheHome(&xdg),xdgConfigHome(&xdg));
+	printf("XDG %.1f [cache: %s] [config: %s]\n",XDG_BASEDIR_SPEC,
+			xdgCacheHome(&xdg),xdgConfigHome(&xdg));
 	return 0;
 }
