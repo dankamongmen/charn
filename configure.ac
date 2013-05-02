@@ -43,6 +43,10 @@ PKG_CHECK_MODULES(DBUS, dbus-1, [have_dbus=yes])
 	CFLAGS+=" $DBUS_CFLAGS"
 	LIBS+=" $DBUS_LIBS"
 
+PKG_CHECK_MODULES(XKBCOMMON, xkbcommon, [have_xkbcommon=yes])
+	CFLAGS+=" $XKBCOMMON_CFLAGS"
+	LIBS+=" $XKBCOMMON_LIBS"
+
 PKG_CHECK_MODULES(FREETYPE, freetype2, [have_freetype2=yes])
 	CFLAGS+=" $FREETYPE_CFLAGS"
 	LIBS+=" $FREETYPE_LIBS"

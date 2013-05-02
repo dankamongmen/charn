@@ -12,6 +12,7 @@
 #include <xcb/xcb_keysyms.h>
 
 // FIXME wrap this state up into an object
+static xcb_key_symbols_t *syms;
 static xcb_connection_t *xcbconn;
 
 static int
@@ -55,33 +56,25 @@ xcb_poll(void){
 	switch(etype){
 		case XCB_KEY_PRESS:{
 			xcb_key_press_event_t *ev = (xcb_key_press_event_t *)xev;
-			xcb_key_symbols_t *syms;
 			xcb_keysym_t sym;
 
-			// FIXME all very experimental!
-			if((syms = xcb_key_symbols_alloc(xcbconn)) == NULL){
-				fprintf(stderr,"Couldn't allocate key symbols\n");
-			}else if(!(sym = xcb_key_press_lookup_keysym(syms,ev,0))){
+			if(!(sym = xcb_key_press_lookup_keysym(syms,ev,0))){
 				fprintf(stderr,"Couldn't translate keycode %d\n",ev->detail);
 			}else{
-				printf("GOT KEYSYM?\n");
+				printf("GOT KEYPRESS?\n");
 			}
-			xcb_key_symbols_free(syms);
+			printf("FREED KEYSYM!\n");
 			break;
 		}case XCB_KEY_RELEASE:{
 			xcb_key_release_event_t *ev = (xcb_key_release_event_t *)xev;
-			xcb_key_symbols_t *syms;
 			xcb_keysym_t sym;
 
-			// FIXME all very experimental!
-			if((syms = xcb_key_symbols_alloc(xcbconn)) == NULL){
-				fprintf(stderr,"Couldn't allocate key symbols\n");
-			}else if(!(sym = xcb_key_release_lookup_keysym(syms,ev,0))){
+			if(!(sym = xcb_key_release_lookup_keysym(syms,ev,0))){
 				fprintf(stderr,"Couldn't translate keycode %d\n",ev->detail);
 			}else{
-				printf("GOT KEYSYM?\n");
+				printf("GOT KEYRELEASE?\n");
 			}
-			xcb_key_symbols_free(syms);
+			printf("FREED KEYSYM!\n");
 			break;
 		}case XCB_BUTTON_PRESS:
 			fprintf(stderr,"XCB button press\n");
@@ -109,6 +102,14 @@ xcb_poll(void){
 static int
 xcbcb(void){
 	return xcb_poll();
+}
+
+int xcb_stop(void){
+	if(syms){
+		xcb_key_symbols_free(syms);
+		syms = NULL;
+	}
+	return 0;
 }
 
 xcb_window_t xcb_init(Display *disp){
@@ -163,6 +164,10 @@ xcb_window_t xcb_init(Display *disp){
 	printf("Connected using XCB-XRandR protocol %d.%d (%d screen%s)\n",
 			rqvrt->major_version,rqvrt->minor_version
 			,screenit.rem,screenit.rem == 1 ? "" : "s");
+	if((syms = xcb_key_symbols_alloc(xcb)) == NULL){
+		fprintf(stderr,"Couldn't allocate key symbols\n");
+		goto err;
+	}
 	wid = (xcb_window_t)-1;
 	for(z = 0 ; z < scrcount ; ++z){
 		xcb_void_cookie_t cwin,cmap;
@@ -215,7 +220,9 @@ xcb_window_t xcb_init(Display *disp){
 		free(sirt);
 		mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
 		values[0] = screenit.data->white_pixel;
-		values[1] = XCB_EVENT_MASK_EXPOSURE;
+		values[1] = XCB_EVENT_MASK_KEY_RELEASE |
+			XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_EXPOSURE |
+			XCB_EVENT_MASK_POINTER_MOTION;
 		// FIXME for multiple screens do we want multiple xcb ids?
 		if((wid = xcb_generate_id(xcb)) == (xcb_window_t)-1){
 			fprintf(stderr,"Couldn't generate XCB ID\n");
