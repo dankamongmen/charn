@@ -26,6 +26,9 @@ LIBS+=${GLUT_LIBS}
 
 AC_CHECK_LIB([m],[sqrt])
 
+# If we're missing the autoconf-gl macros, this will find glut
+AC_CHECK_LIB([glut], [glutInit])
+
 PKG_CHECK_MODULES(X11, x11, [have_x11=yes])
 	CFLAGS+=" $X11_CFLAGS"
 	LIBS+=" $X11_LIBS"
@@ -87,6 +90,8 @@ AX_CHECK_DOCBOOK_XSLT
 AC_PROG_LIBTOOL
 
 SRCDIR=${srcdir}
+
+CFLAGS+="-include config.h"
 
 ## output
 AC_SUBST([CFLAGS])
