@@ -15,6 +15,7 @@ by Nick Black (nick.black@sprezzatech.com)
 ## Requirements
 
 * Autotools + autoconf-gl-macros (if building from git checkout)
+** The latter can be found at http://code.google.com/p/autoconf-gl-macros/
 * OpenGL
 * GLEW (www.opengl.org/sdk/libs/GLEW/)
 * GLUT (www.opengl.org/resources/libraries/glut/)
