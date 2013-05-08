@@ -7,4 +7,6 @@
 xcb_window_t xcb_init(Display *);
 int xcb_stop(void);
 
+int set_title(xcb_window_t,const char *);
+
 #endif

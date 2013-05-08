@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <string.h>
+#include <config.h>
 
 static void
 usage(const char *name,int status){
@@ -71,6 +72,9 @@ int main(int argc,char **argv){
 		return EXIT_FAILURE;
 	}
 	if(event_loop()){
+		return EXIT_FAILURE;
+	}
+	if(set_title(PACKAGE_NAME)){
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;

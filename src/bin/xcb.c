@@ -261,3 +261,18 @@ err:
 	xcb_disconnect(xcb);
 	return -1;
 }
+
+int set_title(xcb_window_t wid,const char *title){
+	xcb_void_cookie_t cookie;
+	xcb_generic_error_t *err;
+
+	cookie = xcb_change_property_checked(xcbconn,XCB_PROP_MODE_REPLACE,wid,
+			XCB_ATOM_WM_NAME,XCB_ATOM_STRING,sizeof(title),
+			strlen(title),title);
+	if( (err = xcb_request_check(xcbconn,cookie)) ){
+		fprintf(stderr,"Couldn't set window title to %s\n",title);
+		free(err);
+		return -1;
+	}
+	return 0;
+}
