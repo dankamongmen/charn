@@ -66,6 +66,10 @@ PKG_CHECK_MODULES(XCBAUX, xcb-aux, [have_xcb_aux=yes])
 	CFLAGS+=" $XCBAUX_CFLAGS"
 	LIBS+=" $XCBAUX_LIBS"
 
+PKG_CHECK_MODULES(XCBEWMH, xcb-ewmh, [have_xcb_ewmh=yes])
+	CFLAGS+=" $XCBEWMH_CFLAGS"
+	LIBS+=" $XCBEWMH_LIBS"
+
 PKG_CHECK_MODULES(XCBKEYSYMS, xcb-keysyms, [have_xcb_keysyms=yes])
 	CFLAGS+=" $XCBKEYSYMS_CFLAGS"
 	LIBS+=" $XCBKEYSYMS_LIBS"

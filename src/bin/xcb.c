@@ -1,19 +1,23 @@
+#include <xcb.h>
 #include <math.h>
 #include <stdio.h>
 #include <epoll.h>
 #include <stdlib.h>
 #include <string.h>
+#include <GL/glut.h>
 #include <xcb/xcb.h>
 #include <X11/Xlib.h>
 #include <xcb/randr.h>
 #include <xcb/xcb_aux.h>
 #include <X11/Xlib-xcb.h>
+#include <xcb/xcb_ewmh.h>
 #include <xcb/xcb_event.h>
 #include <xcb/xcb_keysyms.h>
 
 // FIXME wrap this state up into an object
 static xcb_key_symbols_t *syms;
 static xcb_connection_t *xcbconn;
+static xcb_ewmh_connection_t ewmhconn;
 
 static int
 get_xcb_vendor(const xcb_setup_t *xcb){
@@ -147,6 +151,10 @@ xcb_window_t xcb_init(Display *disp){
 	printf("Connected using XCB protocol %hu.%hu on fd %d\n",
 			xcbsetup->protocol_major_version,
 			xcbsetup->protocol_minor_version,xcbfd);
+	if(xcb_ewmh_init_atoms(xcb,&ewmhconn) == NULL){
+		fprintf(stderr,"Couldn't get EWMH properties\n");
+		goto err;
+	}
 	if((xscr = xcb_aux_get_screen(xcb,prefscr)) == NULL){
 		fprintf(stderr,"Couldn't get XCB screen info\n");
 		goto err;
@@ -243,6 +251,7 @@ xcb_window_t xcb_init(Display *disp){
 			fprintf(stderr,"Error mapping root window (%d)\n",xerr->error_code);
 			goto err;
 		}
+		xcbconn = xcb;
 		values[0] = XCB_STACK_MODE_ABOVE;
 		xcb_configure_window(xcb, wid, XCB_CONFIG_WINDOW_STACK_MODE, values);
 		//xcb_set_input_focus(xcb,XCB_INPUT_FOCUS_PARENT,wid,XCB_CURRENT_TIME);
@@ -263,9 +272,13 @@ err:
 }
 
 int set_title(xcb_window_t wid,const char *title){
+	/*
 	xcb_void_cookie_t cookie;
 	xcb_generic_error_t *err;
+	*/
 
+	xcb_ewmh_set_wm_name(&ewmhconn,wid,strlen(title),title);
+	/*
 	cookie = xcb_change_property_checked(xcbconn,XCB_PROP_MODE_REPLACE,wid,
 			XCB_ATOM_WM_NAME,XCB_ATOM_STRING,sizeof(title),
 			strlen(title),title);
@@ -274,5 +287,7 @@ int set_title(xcb_window_t wid,const char *title){
 		free(err);
 		return -1;
 	}
+	*/
+	printf("Set window title to %s\n",title);
 	return 0;
 }
