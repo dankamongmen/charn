@@ -1,6 +1,7 @@
 #include <glx.h>
 #include <stdio.h>
 #include <GL/glx.h>
+#include <GL/glut.h>
 
 static int
 get_glx_vendor(void){
@@ -20,6 +21,7 @@ get_glx_vendor(void){
 		return -1;
 	}
 	printf("GL server: %s %s\n",vend,rend);
+	printf("Using GLUT: %d\n",GLUT_API_VERSION);
 	return 0;
 }
 
