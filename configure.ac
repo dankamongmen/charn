@@ -20,14 +20,21 @@ AX_PTHREAD
 
 # Require autoconf-gl-macros: http://code.google.com/p/autoconf-gl-macros/
 AX_CHECK_GL
+if test "x$no_gl" = "xyes" ; then
+	AC_MSG_ERROR([Cannot find OpenGL.])
+fi
 LIBS+=${GL_LIBS}
+
 AX_CHECK_GLUT
+if test "x$no_glut" = "xyes" ; then
+	AC_MSG_ERROR([Cannot find GLUT.])
+fi
 LIBS+=${GLUT_LIBS}
 
 AC_CHECK_LIB([m],[sqrt])
 
 # If we're missing the autoconf-gl macros, this will find glut
-AC_CHECK_LIB([glut], [glutInit])
+#AC_CHECK_LIB([glut], [glutInit])
 
 PKG_CHECK_MODULES(X11, x11, [have_x11=yes])
 	CFLAGS+=" $X11_CFLAGS"
