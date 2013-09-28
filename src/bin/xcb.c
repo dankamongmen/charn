@@ -65,9 +65,8 @@ xcb_poll(void){
 			if(!(sym = xcb_key_press_lookup_keysym(syms,ev,0))){
 				fprintf(stderr,"Couldn't translate keycode %d\n",ev->detail);
 			}else{
-				printf("GOT KEYPRESS?\n");
+				printf("GOT KEYPRESS (%u)\n",sym);
 			}
-			printf("FREED KEYSYM!\n");
 			break;
 		}case XCB_KEY_RELEASE:{
 			xcb_key_release_event_t *ev = (xcb_key_release_event_t *)xev;
@@ -76,9 +75,8 @@ xcb_poll(void){
 			if(!(sym = xcb_key_release_lookup_keysym(syms,ev,0))){
 				fprintf(stderr,"Couldn't translate keycode %d\n",ev->detail);
 			}else{
-				printf("GOT KEYRELEASE?\n");
+				printf("GOT KEYPRESS (%u)\n",sym);
 			}
-			printf("FREED KEYSYM!\n");
 			break;
 		}case XCB_BUTTON_PRESS:
 			fprintf(stderr,"XCB button press\n");
