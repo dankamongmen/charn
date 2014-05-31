@@ -1,5 +1,6 @@
 #include <glx.h>
 #include <stdio.h>
+#include <string.h>
 #include <GL/glx.h>
 #include <GL/glut.h>
 
@@ -27,7 +28,7 @@ get_glx_vendor(void){
 
 int init_glx(Display *d,xcb_window_t window){
 	GLXFBConfig *glfb,ourfb;
-	int maj,min,numfbs;
+	int maj,min,numfbs,i;
 	GLXContext glctx;
 	GLXDrawable draw;
 	XVisualInfo *xvi;
@@ -42,21 +43,32 @@ int init_glx(Display *d,xcb_window_t window){
 		return 0;
 	}
 	// FIXME 0 needs to be default screen
-	if((glfb = glXGetFBConfigs(d,0,&numfbs)) == NULL || numfbs == 0){
+	if((glfb = glXGetFBConfigs(d,0,&numfbs)) == NULL || numfbs <= 0){
 		fprintf(stderr,"Couldn't detect GLX framebuffers\n");
 		return -1;
 	}
-	// FIXME check all framebuffers, not just the zeroth
-	ourfb = glfb[0];
-	if((xvi = glXGetVisualFromFBConfig(d,ourfb)) == NULL){
-		fprintf(stderr,"Couldn't extract XVisualInfo from GLX\n");
+	printf("%d GLX framebuffer%s\n",numfbs,numfbs == 1 ? "" : "s");
+	xvi = NULL;
+	memset(&ourfb,0,sizeof(ourfb));
+	// FIXME check all framebuffers; the first we find might not be correct
+	for(i = 0 ; i < numfbs ; ++i){
+		ourfb = glfb[i];
+		if((xvi = glXGetVisualFromFBConfig(d,ourfb)) == NULL){
+			fprintf(stderr,"Couldn't extract XVisualInfo from GLX FB %d\n",i);
+		}else{
+			printf("Got XVisualInfo for GLX FB %d\n",i);
+			break;
+		}
+	}
+	if(xvi == NULL){
+		fprintf(stderr,"Couldn't find any XVisualInfo\n");
 		return -1;
 	}
-	if((glctx = glXCreateContext(d,xvi,0,GL_TRUE)) == NULL){
+	if((glctx = glXCreateContext(d,xvi,NULL,GL_TRUE)) == NULL){
 		fprintf(stderr,"Couldn't create GLX context\n");
 		return -1;
 	}
-	draw = glXCreateWindow(d,ourfb,window,0);
+	draw = glXCreateWindow(d,ourfb,window,NULL);
 	if(!glXMakeCurrent(d,draw,glctx)){
 		fprintf(stderr,"Couldn't activate GLX context\n");
 		return -1;
