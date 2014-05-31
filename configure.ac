@@ -18,23 +18,27 @@ AM_PROG_CC_C_O
 
 AX_PTHREAD
 
+# autoconf-gl-macros check for --with-x/--without-x as handled by AC_PATH_X
+AC_PATH_XTRA
+
 # Require autoconf-gl-macros: http://code.google.com/p/autoconf-gl-macros/
 AX_CHECK_GL
 if test "x$no_gl" = "xyes" ; then
 	AC_MSG_ERROR([Cannot find OpenGL.])
 fi
-LIBS+=${GL_LIBS}
+LIBS+=" ${GL_LIBS}"
 
+# Requires libxmu and libxi, but reports "missing GLUT" if it can't find them,
+# unless --without-x is used. It'd be better to fix upstream FIXME.
+AS_IF([test X$no_x != Xyes], [PKG_CHECK_MODULES(XI, xi, [have_xi=yes])])
+AS_IF([test X$no_x != Xyes], [PKG_CHECK_MODULES(XMU, xmu, [have_xmu=yes])])
 AX_CHECK_GLUT
 if test "x$no_glut" = "xyes" ; then
 	AC_MSG_ERROR([Cannot find GLUT.])
 fi
-LIBS+=${GLUT_LIBS}
+LIBS+=" ${GLUT_LIBS}"
 
 AC_CHECK_LIB([m],[sqrt])
-
-# If we're missing the autoconf-gl macros, this will find glut
-#AC_CHECK_LIB([glut], [glutInit])
 
 PKG_CHECK_MODULES(X11, x11, [have_x11=yes])
 	CFLAGS+=" $X11_CFLAGS"
@@ -89,7 +93,7 @@ PKG_CHECK_MODULES(XDGBASEDIR, libxdg-basedir, [have_xdg_basedir=yes])
 	CFLAGS+=" $XDGBASEDIR_CFLAGS"
 	LIBS+=" $XDGBASEDIR_LIBS"
 
-AC_SEARCH_LIBS([SOIL_load_OGL_texture],[SOIL],[],AC_MSG_ERROR([Cannot find libsoil.]))
+AC_SEARCH_LIBS([SOIL_load_OGL_texture],[SOIL],[],AC_MSG_ERROR([Cannot find libSOIL.]))
 LIBS+=" $ac_cv_search_SOIL_load_OGL_texture"
 
 AX_PROG_XSLTPROC
