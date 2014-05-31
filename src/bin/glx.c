@@ -12,7 +12,7 @@ get_glx_vendor(void){
 		fprintf(stderr,"Couldn't get OpenGL version\n");
 		return -1;
 	}
-	printf("Using OpenGL: %s\n",ver);
+	printf("Using OpenGL %s\n",ver);
 	if((vend = glGetString(GL_VENDOR)) == NULL){
 		fprintf(stderr,"Couldn't get OpenGL vendor\n");
 		return -1;
@@ -22,7 +22,7 @@ get_glx_vendor(void){
 		return -1;
 	}
 	printf("GL server: %s %s\n",vend,rend);
-	printf("Using GLUT: %d\n",GLUT_API_VERSION);
+	printf("Using GLUT %d\n",GLUT_API_VERSION);
 	return 0;
 }
 
