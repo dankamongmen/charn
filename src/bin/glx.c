@@ -52,12 +52,18 @@ int init_glx(Display *d,xcb_window_t window){
 	memset(&ourfb,0,sizeof(ourfb));
 	// FIXME check all framebuffers; the first we find might not be correct
 	for(i = 0 ; i < numfbs ; ++i){
+		XVisualInfo *ixvi;
 		ourfb = glfb[i];
-		if((xvi = glXGetVisualFromFBConfig(d,ourfb)) == NULL){
-			fprintf(stderr,"Couldn't extract XVisualInfo from GLX FB %d\n",i);
-		}else{
-			printf("Got XVisualInfo for GLX FB %d\n",i);
-			break;
+		if( (ixvi = glXGetVisualFromFBConfig(d,ourfb)) ){
+			if(xvi){
+				XFree(xvi);
+			}
+			xvi = ixvi;
+		//	r/g/b: 0x%lx/0x%lx/0x%lx colormap: %d bits: %d\n",
+			printf("[GLXfb %02d] screen: %d depth: %d class: %d\n",
+				i,xvi->screen,xvi->depth,xvi->class);
+				//xvi->red_mask,xvi->green_mask,xvi->blue_mask,
+				//xvi->colormap_size,xvi->bits_per_rgb);
 		}
 	}
 	if(xvi == NULL){
@@ -66,8 +72,10 @@ int init_glx(Display *d,xcb_window_t window){
 	}
 	if((glctx = glXCreateContext(d,xvi,NULL,GL_TRUE)) == NULL){
 		fprintf(stderr,"Couldn't create GLX context\n");
+		XFree(xvi);
 		return -1;
 	}
+	XFree(xvi);
 	draw = glXCreateWindow(d,ourfb,window,NULL);
 	if(!glXMakeCurrent(d,draw,glctx)){
 		fprintf(stderr,"Couldn't activate GLX context\n");
