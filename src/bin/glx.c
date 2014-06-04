@@ -76,7 +76,10 @@ int init_glx(Display *d,xcb_window_t window){
 		return -1;
 	}
 	XFree(xvi);
-	draw = glXCreateWindow(d,ourfb,window,NULL);
+	if((draw = glXCreateWindow(d,ourfb,window,NULL)) == 0){
+		fprintf(stderr,"Couldn't create GLX window\n");
+		return -1;
+	}
 	if(!glXMakeCurrent(d,draw,glctx)){
 		fprintf(stderr,"Couldn't activate GLX context\n");
 		return -1;
