@@ -14,13 +14,37 @@ by Nick Black (nick.black@sprezzatech.com)
 
 ## Requirements
 
-* Autotools
+* Autotools, autoconf-archive, and C development tools
 * autoconf-gl-macros (http://code.google.com/p/autoconf-gl-macros/)
 * OpenGL
 * GLEW (www.opengl.org/sdk/libs/GLEW/)
 * GLUT (www.opengl.org/resources/libraries/glut/)
+* FTGL
+* SOIL
 * XDG-basedir
 * XCB
+* XKB
+* XI2
+
+On Debian-derived systems, this includes:
+
+* libglew-dev
+* freeglut3-dev
+* libftgl-dev
+* libsoil-dev
+* libxdg-basedir-dev
+* libx11-xcb-dev
+* xcb-proto
+* libxcb-ewmh1-dev
+* libxcb-keysyms1-dev
+* libxcb-randr0-dev
+* libxcb-util0-dev
+* libxkbcommon-dev
+
+## Building
+
+* From git: autoreconf -fis && ./configure && make && sudo make install
+* From tarball: ./configure && make && sudo make install
 
 ## Reading
 
