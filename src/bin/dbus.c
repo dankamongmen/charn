@@ -13,15 +13,26 @@ static dbus_state ctx;
 typedef int (*dbuscb)(void);
 
 static int
-sessioncb(void){
-	fprintf(stderr,"Session DBus callback\n");
+handle_dbus_msg(DBusConnection *dbc,const char *name){
+	DBusDispatchStatus dstat;
+
+	fprintf(stderr,"%s DBus callback [status %d]\n",name,
+			dbus_connection_get_dispatch_status(dbc));
+	dstat = dbus_connection_dispatch(dbc);
+	if(dstat != DBUS_DISPATCH_COMPLETE){ // FIXME do better
+		fprintf(stderr,"Couldn't empty the DBus dispatch queue\n");
+	}
 	return 0;
 }
 
 static int
+sessioncb(void){
+	return handle_dbus_msg(ctx.session,"Session");
+}
+
+static int
 systemcb(void){
-	fprintf(stderr,"System DBus callback\n");
-	return 0;
+	return handle_dbus_msg(ctx.system,"System");
 }
 
 static DBusConnection *

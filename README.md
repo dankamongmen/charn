@@ -16,6 +16,7 @@ by Nick Black (nick.black@sprezzatech.com)
 
 * Autotools, autoconf-archive, and C development tools
 * autoconf-gl-macros (http://code.google.com/p/autoconf-gl-macros/)
+* Docbook with XSL support
 * OpenGL
 * GLEW (www.opengl.org/sdk/libs/GLEW/)
 * GLUT (www.opengl.org/resources/libraries/glut/)
@@ -25,14 +26,20 @@ by Nick Black (nick.black@sprezzatech.com)
 * XCB
 * XKB
 * XI2
+* DBUS
 
 On Debian-derived systems, this includes:
 
+* autoconf
+* autoconf-archive
+* docbook-xsl
+* libgl1-mesa-dev
 * libglew-dev
 * freeglut3-dev
 * libftgl-dev
 * libsoil-dev
 * libxdg-basedir-dev
+* libdbus-1-dev
 * libx11-xcb-dev
 * xcb-proto
 * libxcb-ewmh1-dev
