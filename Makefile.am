@@ -1,6 +1,8 @@
 LANG=C
 LC_ALL=c
 
+ACLOCAL_AMFLAGS=-I m4
+
 AM_CFLAGS=-O2 -Wall -Werror -W -Wshadow -Wextra -fvisibility=hidden \
 	  	$(PTHREAD_CFLAGS)
 AM_LDFLAGS=-Wl,-O2,--no-undefined-version,--enable-new-dtags,--as-needed,--warn-common
