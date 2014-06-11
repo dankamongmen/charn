@@ -26,7 +26,6 @@ by Nick Black (nick.black@sprezzatech.com)
 * XCB
 * XKB
 * XI2
-* DBUS
 
 On Debian-derived systems, this includes:
 
@@ -39,7 +38,6 @@ On Debian-derived systems, this includes:
 * libftgl-dev
 * libsoil-dev
 * libxdg-basedir-dev
-* libdbus-1-dev
 * libx11-xcb-dev
 * xcb-proto
 * libxcb-ewmh1-dev

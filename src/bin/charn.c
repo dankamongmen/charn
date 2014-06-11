@@ -3,7 +3,7 @@
 #include <xcb.h>
 #include <xdg.h>
 #include <glx.h>
-#include <dbus.h>
+//#include <dbus.h>
 #include <glew.h>
 #include <errno.h>
 #include <stdio.h>
@@ -67,9 +67,9 @@ int main(int argc,char **argv){
 	if(glew_init()){
 		return EXIT_FAILURE;
 	}
-	if(dbus_init()){
+	/*if(dbus_init()){
 		return EXIT_FAILURE;
-	}
+	}*/
 	if(set_title(wid,PACKAGE_NAME)){
 		return EXIT_FAILURE;
 	}

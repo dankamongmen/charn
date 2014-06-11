@@ -53,9 +53,12 @@ PKG_CHECK_MODULES(XI2, [xi >= 1.5.99.1] [inputproto >= 2.1.99.1], [have_xi=yes])
 	CFLAGS+=" $XI2_CFLAGS"
 	LIBS+=" $XI2_LIBS"
 
-PKG_CHECK_MODULES(DBUS, dbus-1, [have_dbus=yes])
-	CFLAGS+=" $DBUS_CFLAGS"
-	LIBS+=" $DBUS_LIBS"
+# According to http://www.freedesktop.org/wiki/Software/dbus/, libdbus is "not
+# intended for direct use, but rather as a reference implementation for other
+# reimplementations." Leave DBus aside for now.
+#PKG_CHECK_MODULES(DBUS, dbus-1, [have_dbus=yes])
+#	CFLAGS+=" $DBUS_CFLAGS"
+#	LIBS+=" $DBUS_LIBS"
 
 PKG_CHECK_MODULES(XKBCOMMON, xkbcommon, [have_xkbcommon=yes])
 	CFLAGS+=" $XKBCOMMON_CFLAGS"

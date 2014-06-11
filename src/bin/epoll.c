@@ -43,7 +43,7 @@ int event_loop(void){
 		while((e = epoll_pwait(eqfd,events,sizeof(events) / sizeof(*events),-1,&ss)) >= 0){
 			while(e--){
 				if(((int(*)(void))events[e].data.ptr)()){
-					goto cberror;
+					goto cberror; // FIXME surely not
 				}
 			}
 		}
