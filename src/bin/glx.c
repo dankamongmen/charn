@@ -55,13 +55,19 @@ int init_glx(Display *d,xcb_window_t window){
 		XVisualInfo *ixvi;
 		ourfb = glfb[i];
 		if( (ixvi = glXGetVisualFromFBConfig(d,ourfb)) ){
+			int sampbuf,samples,dbuffered;
 			if(xvi){
 				XFree(xvi);
 			}
 			xvi = ixvi;
+			glXGetFBConfigAttrib(d, ourfb, GLX_SAMPLE_BUFFERS, &sampbuf   );
+			glXGetFBConfigAttrib(d, ourfb, GLX_SAMPLES       , &samples   );
+			glXGetFBConfigAttrib(d, ourfb, GLX_DOUBLEBUFFER  , &dbuffered );
 		//	r/g/b: 0x%lx/0x%lx/0x%lx colormap: %d bits: %d\n",
-			printf("[GLXfb %02d] screen: %d depth: %d class: %d\n",
-				i,xvi->screen,xvi->depth,xvi->class);
+		//	vID: %lu (xvi->visualid)
+			printf("[GLXfb %d] screen: %d depth: %d class: %d sampbuf: %d samples: %d dbuffer: %d\n",
+				i,xvi->screen,xvi->depth,xvi->class,
+				sampbuf,samples,dbuffered);
 				//xvi->red_mask,xvi->green_mask,xvi->blue_mask,
 				//xvi->colormap_size,xvi->bits_per_rgb);
 		}
