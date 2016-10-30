@@ -4,12 +4,17 @@
 
 static int
 x11_error_handler(Display *dpy,XErrorEvent *xee){
+	char errorstring[128]; // FIXME can we do better? ugh
 	// FIXME need thread-safety!
 	if(!dpy || !xee){
 		fprintf(stderr,"XError with NULL display/xerrorevent\n");
 		return -1;
 	}
-	// FIXME format dpy/xee for display
+	// FIXME format dpy
+	XGetErrorText(dpy, xee->error_code, errorstring, sizeof(errorstring));
+	fprintf(stderr,"XError (req %lu %d.%d) %d: %s\n", xee->serial,
+			xee->request_code, xee->minor_code, xee->error_code,
+			errorstring);
 	return 0;
 }
 

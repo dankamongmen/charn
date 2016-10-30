@@ -86,7 +86,7 @@ int init_glx(Display *d,xcb_window_t window){
 		fprintf(stderr,"Couldn't create GLX window\n");
 		return -1;
 	}
-	if(!glXMakeCurrent(d,draw,glctx)){
+	if(glXMakeCurrent(d,draw,glctx) != GL_TRUE){
 		fprintf(stderr,"Couldn't activate GLX context\n");
 		return -1;
 	}
