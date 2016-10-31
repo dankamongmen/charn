@@ -12,9 +12,8 @@ x11_error_handler(Display *dpy,XErrorEvent *xee){
 	}
 	// FIXME format dpy
 	XGetErrorText(dpy, xee->error_code, errorstring, sizeof(errorstring));
-	fprintf(stderr,"XError (req %lu %d.%d) %d: %s\n", xee->serial,
-			xee->request_code, xee->minor_code, xee->error_code,
-			errorstring);
+	fprintf(stderr, "XError %d (req %lu, %d-%d): %s\n", xee->error_code,
+		xee->serial, xee->request_code, xee->minor_code, errorstring);
 	return 0;
 }
 
