@@ -270,13 +270,10 @@ err:
 }
 
 int set_title(xcb_window_t wid,const char *title){
-	/*
 	xcb_void_cookie_t cookie;
 	xcb_generic_error_t *err;
-	*/
 
 	xcb_ewmh_set_wm_name(&ewmhconn,wid,strlen(title),title);
-	/*
 	cookie = xcb_change_property_checked(xcbconn,XCB_PROP_MODE_REPLACE,wid,
 			XCB_ATOM_WM_NAME,XCB_ATOM_STRING,sizeof(title),
 			strlen(title),title);
@@ -285,7 +282,6 @@ int set_title(xcb_window_t wid,const char *title){
 		free(err);
 		return -1;
 	}
-	*/
 	printf("Set window title to %s\n",title);
 	return 0;
 }
