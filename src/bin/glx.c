@@ -55,21 +55,20 @@ int init_glx(Display *d,xcb_window_t window){
 	for(i = 0 ; i < numfbs ; ++i){
 		XVisualInfo *ixvi;
 		if( (ixvi = glXGetVisualFromFBConfig(d, glfb[i])) ){
-			int sampbuf, samples, dbuffered, xid;
+			int samples, dbuffered, xid;
 			if(xviptr){
 				XFree(xviptr);
 			}
 			xviptr = ixvi;
 			glXGetFBConfigAttrib(d, glfb[i], GLX_FBCONFIG_ID, &xid);
-			glXGetFBConfigAttrib(d, glfb[i], GLX_SAMPLE_BUFFERS, &sampbuf);
 			glXGetFBConfigAttrib(d, glfb[i], GLX_SAMPLES, &samples);
 			glXGetFBConfigAttrib(d, glfb[i], GLX_DOUBLEBUFFER, &dbuffered);
 			//r/g/b: 0x%lx/0x%lx/0x%lx colormap: %d bits: %d\n",
 			//xviptr->red_mask,xviptr->green_mask,xviptr->blue_mask,
 			//xviptr->colormap_size,xviptr->bits_per_rgb);
-			printf("[fb 0x%03x] scrn %d dpp %d class %d sampbuf %d samples %2d dbuf? %d vID %lu\n",
+			printf("[fb 0x%03x] scrn %d dpp %d class %d samples %2d dbuf? %d vID %lu\n",
 				xid, xviptr->screen, xviptr->depth,
-				xviptr->class, sampbuf, samples, dbuffered,
+				xviptr->class, samples, dbuffered,
 				xviptr->visualid);
 			// FIXME intelligently select framebuffer config...how?
 			// first framebuffer always seems to work, others don't.
