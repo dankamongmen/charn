@@ -27,11 +27,11 @@ get_glx_vendor(void){
 }
 
 int init_glx(Display *d,xcb_window_t window){
-	GLXFBConfig *glfb,ourfb;
-	int maj,min,numfbs,i;
+	int maj, min, numfbs, i, fbxid;
+	GLXFBConfig *glfb, ourfb;
+	XVisualInfo xvi, *xviptr;
 	GLXContext glctx;
 	GLXDrawable draw;
-	XVisualInfo *xvi;
 
 	if(!glXQueryVersion(d,&maj,&min)){
 		fprintf(stderr,"Couldn't query GLX version\n");
@@ -47,41 +47,54 @@ int init_glx(Display *d,xcb_window_t window){
 		fprintf(stderr,"Couldn't detect GLX framebuffers\n");
 		return -1;
 	}
+	// glxinfo decodes this information under the GLXFBConfigs header.
 	printf("%d GLX framebuffer%s\n",numfbs,numfbs == 1 ? "" : "s");
-	xvi = NULL;
-	memset(&ourfb,0,sizeof(ourfb));
-	// FIXME check all framebuffers; the first we find might not be correct
+	xviptr = NULL;
+	memset(&xvi, 0, sizeof(xvi));
+	memset(&ourfb, 0, sizeof(ourfb));
 	for(i = 0 ; i < numfbs ; ++i){
 		XVisualInfo *ixvi;
-		ourfb = glfb[i];
-		if( (ixvi = glXGetVisualFromFBConfig(d,ourfb)) ){
-			int sampbuf,samples,dbuffered;
-			if(xvi){
-				XFree(xvi);
+		if( (ixvi = glXGetVisualFromFBConfig(d, glfb[i])) ){
+			int sampbuf, samples, dbuffered, xid;
+			if(xviptr){
+				XFree(xviptr);
 			}
-			xvi = ixvi;
-			glXGetFBConfigAttrib(d, ourfb, GLX_SAMPLE_BUFFERS, &sampbuf   );
-			glXGetFBConfigAttrib(d, ourfb, GLX_SAMPLES       , &samples   );
-			glXGetFBConfigAttrib(d, ourfb, GLX_DOUBLEBUFFER  , &dbuffered );
-		//	r/g/b: 0x%lx/0x%lx/0x%lx colormap: %d bits: %d\n",
-		//	vID: %lu (xvi->visualid)
-			printf("[GLXfb %d] screen: %d depth: %d class: %d sampbuf: %d samples: %d dbuffer: %d\n",
-				i,xvi->screen,xvi->depth,xvi->class,
-				sampbuf,samples,dbuffered);
-				//xvi->red_mask,xvi->green_mask,xvi->blue_mask,
-				//xvi->colormap_size,xvi->bits_per_rgb);
+			xviptr = ixvi;
+			glXGetFBConfigAttrib(d, glfb[i], GLX_FBCONFIG_ID, &xid);
+			glXGetFBConfigAttrib(d, glfb[i], GLX_SAMPLE_BUFFERS, &sampbuf);
+			glXGetFBConfigAttrib(d, glfb[i], GLX_SAMPLES, &samples);
+			glXGetFBConfigAttrib(d, glfb[i], GLX_DOUBLEBUFFER, &dbuffered);
+			//r/g/b: 0x%lx/0x%lx/0x%lx colormap: %d bits: %d\n",
+			//xviptr->red_mask,xviptr->green_mask,xviptr->blue_mask,
+			//xviptr->colormap_size,xviptr->bits_per_rgb);
+			printf("[fb 0x%03x] scrn %d dpp %d class %d sampbuf %d samples %2d dbuf? %d vID %lu\n",
+				xid, xviptr->screen, xviptr->depth,
+				xviptr->class, sampbuf, samples, dbuffered,
+				xviptr->visualid);
+			// FIXME intelligently select framebuffer config...how?
+			// first framebuffer always seems to work, others don't.
+			if(i == 0) {
+				ourfb = glfb[i];
+				memcpy(&xvi, ixvi, sizeof(xvi));
+				fbxid = xid;
+			}
+		}else{
+			// FIXME what are these? glxinfo treats them as real
+			// framebuffer types with depths of 0. there's a lot
+			// of them, so don't clutter stderr for now...
+			// fprintf(stderr,"Couldn't get visual info for framebuffer %d\n", i);
 		}
 	}
-	if(xvi == NULL){
+	if(xviptr == NULL){
 		fprintf(stderr,"Couldn't find any XVisualInfo\n");
 		return -1;
 	}
-	if((glctx = glXCreateContext(d,xvi,NULL,GL_TRUE)) == NULL){
+	XFree(xviptr);
+	printf("Using framebuffer XID 0x%03x\n", fbxid);
+	if((glctx = glXCreateContext(d,&xvi,NULL,GL_TRUE)) == NULL){
 		fprintf(stderr,"Couldn't create GLX context\n");
-		XFree(xvi);
 		return -1;
 	}
-	XFree(xvi);
 	if((draw = glXCreateWindow(d,ourfb,window,NULL)) == 0){
 		fprintf(stderr,"Couldn't create GLX window\n");
 		return -1;
