@@ -1,3 +1,4 @@
+#include "charn.h"
 #include <x11.h>
 #include <xi2.h>
 #include <xcb.h>
@@ -12,6 +13,8 @@
 #include <locale.h>
 #include <string.h>
 
+int Verbose;
+
 static void
 usage(const char *name,int status){
 	FILE *fp = status ? stderr : stdout;
@@ -19,12 +22,14 @@ usage(const char *name,int status){
 	fprintf(fp,"usage: %s [ options ]\n",name);
 	fprintf(fp,"options:\n");
 	fprintf(fp,"\t-h/--help: display this help text\n");
+	fprintf(fp,"\t-v/--verbose: increase verbosity\n");
 	exit(status);
 }
 
 int main(int argc,char **argv){
 	const struct option longopts [] = {
 		{ "help",	0,	NULL,		'h'	},
+		{ "verbose",	0,	NULL,		'v'	},
 		{ NULL,		0,	NULL,		0	}
 	};
 	xcb_window_t wid;
@@ -35,10 +40,15 @@ int main(int argc,char **argv){
 		fprintf(stderr,"Couldn't setlocale(LC_ALL)\n");
 		return EXIT_FAILURE;
 	}
-	while((opt = getopt_long(argc,argv,"h",longopts,&longopt)) >= 0){
+	printf("%s\n", PACKAGE_STRING);
+	Verbose = 0;
+	while((opt = getopt_long(argc,argv,"hv",longopts,&longopt)) >= 0){
 		switch(opt){
 			case 'h':
 				usage(argv[0],EXIT_SUCCESS);
+				break;
+			case 'v':
+				Verbose = 1;
 				break;
 			default:
 				usage(argv[0],EXIT_FAILURE);
