@@ -1,3 +1,4 @@
+#include "charn.h"
 #include <glx.h>
 #include <stdio.h>
 #include <string.h>
@@ -26,10 +27,25 @@ get_glx_vendor(void){
 	return 0;
 }
 
+static int
+print_fbvisual(Display *d, const GLXFBConfig *fb, const XVisualInfo *xvi){
+	int samples, dbuffered, xid;
+
+	glXGetFBConfigAttrib(d, *fb, GLX_FBCONFIG_ID, &xid);
+	glXGetFBConfigAttrib(d, *fb, GLX_SAMPLES, &samples);
+	glXGetFBConfigAttrib(d, *fb, GLX_DOUBLEBUFFER, &dbuffered);
+	//r/g/b: 0x%lx/0x%lx/0x%lx colormap: %d bits: %d\n",
+	//xvi->red_mask,xvi->green_mask,xvi->blue_mask,
+	//xvi->colormap_size,xvi->bits_per_rgb);
+	return printf("fb 0x%03x scrn %d dpp %d class %d samples %2d dbuf? %d vID %lu\n",
+		xid, xvi->screen, xvi->depth, xvi->class, samples, dbuffered,
+		xvi->visualid);
+}
+
 int init_glx(Display *d,xcb_window_t window){
-	int maj, min, numfbs, i, fbxid;
 	GLXFBConfig *glfb, ourfb;
 	XVisualInfo xvi, *xviptr;
+	int maj, min, numfbs, i;
 	GLXContext glctx;
 	GLXDrawable draw;
 
@@ -55,27 +71,18 @@ int init_glx(Display *d,xcb_window_t window){
 	for(i = 0 ; i < numfbs ; ++i){
 		XVisualInfo *ixvi;
 		if( (ixvi = glXGetVisualFromFBConfig(d, glfb[i])) ){
-			int samples, dbuffered, xid;
 			if(xviptr){
 				XFree(xviptr);
 			}
 			xviptr = ixvi;
-			glXGetFBConfigAttrib(d, glfb[i], GLX_FBCONFIG_ID, &xid);
-			glXGetFBConfigAttrib(d, glfb[i], GLX_SAMPLES, &samples);
-			glXGetFBConfigAttrib(d, glfb[i], GLX_DOUBLEBUFFER, &dbuffered);
-			//r/g/b: 0x%lx/0x%lx/0x%lx colormap: %d bits: %d\n",
-			//xviptr->red_mask,xviptr->green_mask,xviptr->blue_mask,
-			//xviptr->colormap_size,xviptr->bits_per_rgb);
-			printf("[fb 0x%03x] scrn %d dpp %d class %d samples %2d dbuf? %d vID %lu\n",
-				xid, xviptr->screen, xviptr->depth,
-				xviptr->class, samples, dbuffered,
-				xviptr->visualid);
+			if(Verbose){
+				print_fbvisual(d, &glfb[i], ixvi);
+			}
 			// FIXME intelligently select framebuffer config...how?
 			// first framebuffer always seems to work, others don't.
 			if(i == 0) {
 				ourfb = glfb[i];
 				memcpy(&xvi, ixvi, sizeof(xvi));
-				fbxid = xid;
 			}
 		}else{
 			// FIXME what are these? glxinfo treats them as real
@@ -89,7 +96,8 @@ int init_glx(Display *d,xcb_window_t window){
 		return -1;
 	}
 	XFree(xviptr);
-	printf("Using framebuffer XID 0x%03x\n", fbxid);
+	printf("Selected ");
+	print_fbvisual(d, &ourfb, &xvi);
 	if((glctx = glXCreateContext(d,&xvi,NULL,GL_TRUE)) == NULL){
 		fprintf(stderr,"Couldn't create GLX context\n");
 		return -1;
