@@ -164,12 +164,12 @@ xcb_window_t xcb_init(Display *disp){
 		fprintf(stderr,"Couldn't get XCB-XRandR version info\n");
 		goto err;
 	}
-	free(rqvrt);
 	screenit = xcb_setup_roots_iterator(xcbsetup);
 	scrcount = screenit.rem;
 	printf("Connected using XCB-XRandR protocol %d.%d (%d screen%s)\n",
-			rqvrt->major_version,rqvrt->minor_version
-			,screenit.rem,screenit.rem == 1 ? "" : "s");
+			rqvrt->major_version, rqvrt->minor_version,
+			screenit.rem, screenit.rem == 1 ? "" : "s");
+	free(rqvrt);
 	if((syms = xcb_key_symbols_alloc(xcb)) == NULL){
 		fprintf(stderr,"Couldn't allocate key symbols\n");
 		goto err;
