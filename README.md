@@ -15,7 +15,6 @@ by Nick Black (nick.black@sprezzatech.com)
 ## Requirements
 
 * Autotools, autoconf-archive, and C development tools
-* autoconf-gl-macros (http://code.google.com/p/autoconf-gl-macros/)
 * Docbook with XSL support
 * OpenGL
 * GLEW (www.opengl.org/sdk/libs/GLEW/)
@@ -31,6 +30,7 @@ On Debian-derived systems, this includes:
 
 * autoconf
 * autoconf-archive
+* autoconf-gl-macros
 * docbook-xsl
 * libgl1-mesa-dev
 * libglew-dev
