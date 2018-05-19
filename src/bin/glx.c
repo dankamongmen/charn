@@ -44,46 +44,46 @@ print_fbvisual(Display *d, const GLXFBConfig *fb, const XVisualInfo *xvi){
 
 int init_glx(Display *d,xcb_window_t window){
 	GLXFBConfig *glfb, ourfb;
-	XVisualInfo xvi, *xviptr;
 	int maj, min, numfbs, i;
 	GLXContext glctx;
 	GLXDrawable draw;
 
-	if(!glXQueryVersion(d,&maj,&min)){
-		fprintf(stderr,"Couldn't query GLX version\n");
+	if(!glXQueryVersion(d, &maj, &min)){
+		fprintf(stderr, "Couldn't query GLX version\n");
 		return -1;
 	}
-	printf("Using GLX %d.%d\n",maj,min);
+	printf("Using GLX %d.%d\n", maj, min);
 	if( (glctx = glXGetCurrentContext()) ){
-		fprintf(stderr,"Already had a GLX context\n");
+		fprintf(stderr, "Already had a GLX context\n");
 		return 0;
 	}
-	// FIXME 0 needs to be default screen
-	if((glfb = glXGetFBConfigs(d,0,&numfbs)) == NULL || numfbs <= 0){
-		fprintf(stderr,"Couldn't detect GLX framebuffers\n");
+	// FIXME replace 0 with actual default/selected screen
+	if((glfb = glXGetFBConfigs(d, 0, &numfbs)) == NULL || numfbs <= 0){
+		fprintf(stderr, "Couldn't detect GLX framebuffers\n");
 		return -1;
 	}
 	// glxinfo decodes this information under the GLXFBConfigs header.
-	printf("%d possible GLX framebuffer%s\n",numfbs,numfbs == 1 ? "" : "s");
-	xviptr = NULL;
+	printf("%d possible GLX framebuffer%s\n", numfbs, numfbs == 1 ? "" : "s");
+	// xvi will hold a copy of the selected XVisualInfo so long as validfbs
+	// is greater than 0. ourfb will hold a copy of the GLXFBConfig.
+	XVisualInfo xvi;
 	memset(&xvi, 0, sizeof(xvi));
 	memset(&ourfb, 0, sizeof(ourfb));
+	unsigned validfbs = 0;
 	for(i = 0 ; i < numfbs ; ++i){
 		XVisualInfo *ixvi;
 		if( (ixvi = glXGetVisualFromFBConfig(d, glfb[i])) ){
-			if(xviptr){
-				XFree(xviptr);
-			}
 			if(Verbose){
+				printf("Discovered ");
 				print_fbvisual(d, &glfb[i], ixvi);
 			}
 			// FIXME intelligently select framebuffer config...how?
 			// first framebuffer always seems to work, others don't.
-			if(!xviptr){
+			if(validfbs++ == 0){
 				ourfb = glfb[i];
 				memcpy(&xvi, ixvi, sizeof(xvi));
 			}
-			xviptr = ixvi;
+			XFree(ixvi);
 		}else{
 			// FIXME what are these? glxinfo treats them as real
 			// framebuffer types with depths of 0. there's a lot
@@ -91,11 +91,11 @@ int init_glx(Display *d,xcb_window_t window){
 			// fprintf(stderr,"Couldn't get visual info for framebuffer %d\n", i);
 		}
 	}
-	if(xviptr == NULL){
-		fprintf(stderr,"Couldn't find any XVisualInfo\n");
+	if(validfbs == 0){
+		fprintf(stderr,"Couldn't find any real GLX VisualInfo\n");
 		return -1;
 	}
-	XFree(xviptr);
+	printf("Found %d real GLX framebuffer%s\n", validfbs, validfbs == 1 ? "" : "s");
 	printf("Selected ");
 	print_fbvisual(d, &ourfb, &xvi);
 	if((glctx = glXCreateContext(d, &xvi, NULL, GL_TRUE)) == NULL){
