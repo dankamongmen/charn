@@ -45,6 +45,18 @@ get_xcb_vendor(const xcb_setup_t *xcb){
 }
 
 static int
+handle_configure_request(xcb_connection_t *xcb, const xcb_configure_request_event_t *ev){
+	xcb_configure_notify_event_t ce;
+	memset(&ce, 0, sizeof(ce));
+	ce.response_type = XCB_CONFIGURE_NOTIFY;
+	ce.event = ev->window;
+	ce.window = ev->window;
+	// FIXME set more parameters
+	xcb_send_event(xcb, 0, ev->window, XCB_EVENT_MASK_STRUCTURE_NOTIFY, (char *)&ce);
+	return 0;
+}
+
+static int
 xcb_poll(void){
 	xcb_generic_event_t *xev;
 	unsigned etype;
@@ -93,6 +105,11 @@ xcb_poll(void){
 			break;
 		case XCB_MOTION_NOTIFY:
 			fprintf(stderr, "XCB motion\n");
+			break;
+		case XCB_CONFIGURE_REQUEST:
+			Vfprintf(stdout, "XCB configure request\n");
+			xcb_configure_request_event_t *ev = (xcb_configure_request_event_t *)xev;
+			handle_configure_request(xcbconn, ev);
 			break;
 		default:
 			fprintf(stderr, "Unhandled XCB event %d\n", etype);
