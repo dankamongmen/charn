@@ -64,7 +64,7 @@ int init_glx(Display *d,xcb_window_t window){
 		return -1;
 	}
 	// glxinfo decodes this information under the GLXFBConfigs header.
-	printf("%d GLX framebuffer%s\n",numfbs,numfbs == 1 ? "" : "s");
+	printf("up to %d GLX framebuffer%s\n",numfbs,numfbs == 1 ? "" : "s");
 	xviptr = NULL;
 	memset(&xvi, 0, sizeof(xvi));
 	memset(&ourfb, 0, sizeof(ourfb));
@@ -74,16 +74,16 @@ int init_glx(Display *d,xcb_window_t window){
 			if(xviptr){
 				XFree(xviptr);
 			}
-			xviptr = ixvi;
 			if(Verbose){
 				print_fbvisual(d, &glfb[i], ixvi);
 			}
 			// FIXME intelligently select framebuffer config...how?
 			// first framebuffer always seems to work, others don't.
-			if(i == 0) {
+			if(!xviptr){
 				ourfb = glfb[i];
 				memcpy(&xvi, ixvi, sizeof(xvi));
 			}
+			xviptr = ixvi;
 		}else{
 			// FIXME what are these? glxinfo treats them as real
 			// framebuffer types with depths of 0. there's a lot
@@ -98,7 +98,7 @@ int init_glx(Display *d,xcb_window_t window){
 	XFree(xviptr);
 	printf("Selected ");
 	print_fbvisual(d, &ourfb, &xvi);
-	if((glctx = glXCreateContext(d,&xvi,NULL,GL_TRUE)) == NULL){
+	if((glctx = glXCreateContext(d, &xvi, NULL, GL_TRUE)) == NULL){
 		fprintf(stderr,"Couldn't create GLX context\n");
 		return -1;
 	}
@@ -113,5 +113,6 @@ int init_glx(Display *d,xcb_window_t window){
 	if(get_glx_vendor()){
 		return -1;
 	}
+	printf("GLX successfully initialized\n");
 	return 0;
 }
