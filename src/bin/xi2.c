@@ -2,6 +2,7 @@
 #include <xcb.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 #include <pthread.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/XInput2.h>
@@ -22,22 +23,22 @@ xi2tid(void *vdisp){
 }*/
 
 static int
-enable_xi2_events(Display *x11conn,xcb_window_t win){
+enable_xi2_events(Display *x11conn, xcb_window_t win){
+	unsigned char mask[(XI_LASTEVENT + 7) / 8];
 	XIEventMask eventmask;
-	unsigned char mask[1];
 
+	memset(mask, 0, sizeof(mask));
 	eventmask.deviceid = XIAllDevices;
 	eventmask.mask_len = sizeof(mask);
 	eventmask.mask = mask;
 	assert(x11conn);
-	assert(eventmask.mask);
-	XISetMask(mask,XI_ButtonPress);
-	XISetMask(mask,XI_Motion);
-	XISetMask(mask,XI_KeyPress);
+	XISetMask(mask, XI_ButtonPress);
+	XISetMask(mask, XI_Motion);
+	XISetMask(mask, XI_KeyPress);
 	// FIXME
 	assert(win != DefaultRootWindow(x11conn));
-	if(XISelectEvents(x11conn,win,&eventmask,1)){
-		fprintf(stderr,"Couldn't select XI2 events\n");
+	if(XISelectEvents(x11conn, win, &eventmask, 1)){
+		fprintf(stderr, "Couldn't select XI2 events\n");
 		return -1;
 	}
 	//pthread_create(&tid,NULL,xi2tid,x11conn);
