@@ -17,6 +17,8 @@ x11_error_handler(Display *dpy,XErrorEvent *xee){
 	XGetErrorText(dpy, xee->error_code, errorstring, sizeof(errorstring));
 	fprintf(stderr, "XError %d (req %lu, %d-%d): %s\n", xee->error_code,
 		xee->serial, xee->request_code, xee->minor_code, errorstring);
+	// FIXME probably want to support a configuration option as to whether
+	//  we ought call Xlib's old_error_handler (and thus exit)
 	return old_error_handler ? old_error_handler(dpy, xee) : 0;
 }
 

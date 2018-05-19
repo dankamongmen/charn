@@ -64,7 +64,7 @@ int init_glx(Display *d,xcb_window_t window){
 		return -1;
 	}
 	// glxinfo decodes this information under the GLXFBConfigs header.
-	printf("up to %d GLX framebuffer%s\n",numfbs,numfbs == 1 ? "" : "s");
+	printf("%d possible GLX framebuffer%s\n",numfbs,numfbs == 1 ? "" : "s");
 	xviptr = NULL;
 	memset(&xvi, 0, sizeof(xvi));
 	memset(&ourfb, 0, sizeof(ourfb));
