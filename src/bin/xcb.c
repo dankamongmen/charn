@@ -73,29 +73,29 @@ xcb_poll(void){
 			xcb_key_release_event_t *ev = (xcb_key_release_event_t *)xev;
 			xcb_keysym_t sym;
 
-			if(!(sym = xcb_key_release_lookup_keysym(syms,ev,0))){
-				fprintf(stderr,"Couldn't translate keycode %d\n",ev->detail);
+			if(!(sym = xcb_key_release_lookup_keysym(syms, ev, 0))){
+				fprintf(stderr, "Couldn't translate keycode %d\n",ev->detail);
 			}else{
 				printf("GOT KEYRELEASE (%u 0x%x state: %d)\n",sym,sym,ev->state);
 			}
 			break;
 		}case XCB_BUTTON_PRESS:
-			fprintf(stderr,"XCB button press\n");
+			fprintf(stderr, "XCB button press\n");
 			break;
 		case XCB_EXPOSE:
-			fprintf(stderr,"XCB expose\n");
+			fprintf(stderr, "XCB expose\n");
 			break;
 		case XCB_CLIENT_MESSAGE:
-			fprintf(stderr,"XCB client\n");
+			fprintf(stderr, "XCB client\n");
 			break;
 		case XCB_MAPPING_NOTIFY:
-			fprintf(stderr,"XCB mapping\n");
+			fprintf(stderr, "XCB mapping\n");
 			break;
 		case XCB_MOTION_NOTIFY:
-			fprintf(stderr,"XCB motion\n");
+			fprintf(stderr, "XCB motion\n");
 			break;
 		default:
-			fprintf(stderr,"unhandled XCB event %d\n",etype);
+			fprintf(stderr, "Unhandled XCB event %d\n", etype);
 			break;
 	}
 	free(xev);

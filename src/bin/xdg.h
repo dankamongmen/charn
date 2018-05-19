@@ -1,6 +1,8 @@
 #ifndef CHARN_XDG
 #define CHARN_XDG
 
-int xdg_init(void);
+struct CharnConfig;
+
+int xdg_init(struct CharnConfig *cc);
 
 #endif

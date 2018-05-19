@@ -1,4 +1,5 @@
 #include "charn.h"
+#include "config.h"
 #include <x11.h>
 #include <xi2.h>
 #include <xcb.h>
@@ -37,6 +38,7 @@ int main(int argc,char **argv){
 	};
 	xcb_window_t wid;
 	int opt,longopt;
+	CharnConfig cc;
 	Display *dpy;
 
 	if((setlocale(LC_ALL,NULL)) == NULL){
@@ -64,7 +66,10 @@ int main(int argc,char **argv){
 				break;
 		}
 	}
-	if(xdg_init()){
+	if(init_config(&cc)){
+		return EXIT_FAILURE;
+	}
+	if(xdg_init(&cc)){
 		return EXIT_FAILURE;
 	}
 	if((dpy = init_x11()) == NULL){
