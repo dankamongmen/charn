@@ -1,6 +1,7 @@
 #include <x11.h>
 #include <stdio.h>
 #include <X11/Xlib.h>
+#include <charn.h>
 
 static int (*old_error_handler)(Display *, XErrorEvent *);
 static int (*old_ioerror_handler)(Display *);
@@ -17,9 +18,12 @@ x11_error_handler(Display *dpy,XErrorEvent *xee){
 	XGetErrorText(dpy, xee->error_code, errorstring, sizeof(errorstring));
 	fprintf(stderr, "XError %d (req %lu, %d-%d): %s\n", xee->error_code,
 		xee->serial, xee->request_code, xee->minor_code, errorstring);
-	// FIXME probably want to support a configuration option as to whether
-	//  we ought call Xlib's old_error_handler (and thus exit)
-	return old_error_handler ? old_error_handler(dpy, xee) : 0;
+	// Xlib default error handler terminates the process :/ It would be
+	//  nice to get its detailed output, though FIXME
+	if(ErrorSoftfail || !old_error_handler){
+		return 0;
+	}
+	return old_error_handler(dpy, xee);
 }
 
 // Xlib exits no matter the return value from this function

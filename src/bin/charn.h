@@ -6,6 +6,7 @@
 
 // Global "read-only" state, set during startup
 extern int Verbose; // whether to print verbose diagnostics
+extern int ErrorSoftfail; // if non-0, don't call through to Xlib error handler
 
 // Diagnostics
 static inline int

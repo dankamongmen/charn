@@ -14,15 +14,17 @@
 #include <string.h>
 
 int Verbose;
+int ErrorSoftfail;
 
 static void
 usage(const char *name,int status){
 	FILE *fp = status ? stderr : stdout;
 
-	fprintf(fp,"usage: %s [ options ]\n",name);
-	fprintf(fp,"options:\n");
-	fprintf(fp,"\t-h/--help: display this help text\n");
-	fprintf(fp,"\t-v/--verbose: increase verbosity\n");
+	fprintf(fp, "usage: %s [ options ]\n",name);
+	fprintf(fp, "options:\n");
+	fprintf(fp, "\t-e/--error: don't exit on soft X errors\n");
+	fprintf(fp, "\t-h/--help: display this help text\n");
+	fprintf(fp, "\t-v/--verbose: increase verbosity\n");
 	exit(status);
 }
 
@@ -30,6 +32,7 @@ int main(int argc,char **argv){
 	const struct option longopts [] = {
 		{ "help",	0,	NULL,		'h'	},
 		{ "verbose",	0,	NULL,		'v'	},
+		{ "error",	0,	NULL,		'e'	},
 		{ NULL,		0,	NULL,		0	}
 	};
 	xcb_window_t wid;
@@ -42,16 +45,21 @@ int main(int argc,char **argv){
 	}
 	printf("%s\n", PACKAGE_STRING);
 	Verbose = 0;
-	while((opt = getopt_long(argc,argv,"hv",longopts,&longopt)) >= 0){
+	ErrorSoftfail = 0;
+	while((opt = getopt_long(argc, argv, "hve", longopts, &longopt)) >= 0){
 		switch(opt){
 			case 'h':
-				usage(argv[0],EXIT_SUCCESS);
+				usage(argv[0], EXIT_SUCCESS);
 				break;
 			case 'v':
 				Verbose = 1;
 				break;
+			case 'e':
+				ErrorSoftfail = 1;
+				printf("Disabling X error passthrough\n");
+				break;
 			default:
-				usage(argv[0],EXIT_FAILURE);
+				usage(argv[0], EXIT_FAILURE);
 				break;
 		}
 	}
