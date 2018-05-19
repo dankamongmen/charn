@@ -115,6 +115,23 @@ int xcb_stop(void){
 	return 0;
 }
 
+// Set ourself up for substructure redirection on the root window. This will
+// fail if another window manager is running.
+static int
+takeover_root(xcb_connection_t *xcb, const xcb_window_t wid){
+	Vfprintf(stdout, "Attempting to take over root window...\n");
+	xcb_grab_server(xcb);
+	const uint32_t select_input_val = XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT;
+        xcb_void_cookie_t cookie;
+	cookie = xcb_change_window_attributes_checked(xcb, wid,
+			XCB_CW_EVENT_MASK, &select_input_val);
+	if(xcb_request_check(xcb, cookie)){
+		fprintf(stderr, "Couldn't redirect root window (is another WM running?)\n");
+		return -1;
+	}
+	return 0;
+}
+
 xcb_window_t xcb_init(Display *disp){
 	xcb_randr_get_screen_info_cookie_t sict;
 	xcb_randr_get_screen_info_reply_t *sirt;
@@ -157,7 +174,7 @@ xcb_window_t xcb_init(Display *disp){
 		fprintf(stderr, "Couldn't get EWMH properties\n");
 		goto err;
 	}
-	if((xscr = xcb_aux_get_screen(xcb,prefscr)) == NULL){
+	if((xscr = xcb_aux_get_screen(xcb, prefscr)) == NULL){
 		fprintf(stderr, "Couldn't get XCB screen info\n");
 		goto err;
 	}
@@ -179,6 +196,9 @@ xcb_window_t xcb_init(Display *disp){
 		goto err;
 	}
 	wid = (xcb_window_t)-1;
+	if(takeover_root(xcb, xscr->root)){
+		goto err;
+	}
 	for(z = 0 ; z < scrcount ; ++z){
 		xcb_void_cookie_t cwin,cmap;
 		xcb_generic_error_t *xerr;
@@ -259,8 +279,7 @@ xcb_window_t xcb_init(Display *disp){
 		//xcb_set_input_focus(xcb,XCB_INPUT_FOCUS_PARENT,wid,XCB_CURRENT_TIME);
 		xcb_screen_next(&screenit);
 	}
-	/*xcb_grab_server(xcb);
-	xcb_grab_keyboard(xcb,1,screenit.data->root,XCB_CURRENT_TIME,
+	/*xcb_grab_keyboard(xcb,1,screenit.data->root,XCB_CURRENT_TIME,
 			XCB_GRAB_MODE_ASYNC,XCB_GRAB_MODE_ASYNC);*/
 	if(add_event_fd(xcbfd,xcbcb)){
 		goto err;
