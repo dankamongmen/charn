@@ -119,16 +119,30 @@ int xcb_stop(void){
 // fail if another window manager is running.
 static int
 takeover_root(xcb_connection_t *xcb, const xcb_window_t wid){
-	Vfprintf(stdout, "Attempting to take over root window...\n");
-	xcb_grab_server(xcb);
+	Vfprintf(stdout, "Attempting to grab root window and keyboard...\n");
 	const uint32_t select_input_val = XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT;
-        xcb_void_cookie_t cookie;
-	cookie = xcb_change_window_attributes_checked(xcb, wid,
+        xcb_void_cookie_t wmcookie;
+	wmcookie = xcb_change_window_attributes_checked(xcb, wid,
 			XCB_CW_EVENT_MASK, &select_input_val);
-	if(xcb_request_check(xcb, cookie)){
+	xcb_grab_keyboard_cookie_t kbcookie;
+	kbcookie = xcb_grab_keyboard(xcb, 1, wid,
+			XCB_CURRENT_TIME,
+			XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC);
+	if(xcb_request_check(xcb, wmcookie)){
+		// FIXME implement --replace option, if added
 		fprintf(stderr, "Couldn't redirect root window (is another WM running?)\n");
 		return -1;
 	}
+	xcb_generic_error_t *kberror = NULL;
+	xcb_grab_keyboard_reply_t *reply;
+	if((reply = xcb_grab_keyboard_reply(xcb, kbcookie, &kberror)) == NULL ||
+			reply->status != XCB_GRAB_STATUS_SUCCESS){
+		// FIXME do something with kberror / reply->status (when set)?
+		fprintf(stderr, "Couldn't grab root keyboard\n");
+		return -1;
+	}
+	// FIXME take over existing windows? take ROOT_WINDOW_EVENT_MASK?
+	Vfprintf(stdout, "Look at me--I am the window manager now!\n");
 	return 0;
 }
 
@@ -279,8 +293,6 @@ xcb_window_t xcb_init(Display *disp){
 		//xcb_set_input_focus(xcb,XCB_INPUT_FOCUS_PARENT,wid,XCB_CURRENT_TIME);
 		xcb_screen_next(&screenit);
 	}
-	/*xcb_grab_keyboard(xcb,1,screenit.data->root,XCB_CURRENT_TIME,
-			XCB_GRAB_MODE_ASYNC,XCB_GRAB_MODE_ASYNC);*/
 	if(add_event_fd(xcbfd,xcbcb)){
 		goto err;
 	}

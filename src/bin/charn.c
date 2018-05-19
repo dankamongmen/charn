@@ -46,6 +46,7 @@ int main(int argc,char **argv){
 	printf("%s\n", PACKAGE_STRING);
 	Verbose = 0;
 	ErrorSoftfail = 0;
+	// FIXME implement -r/--replace option
 	while((opt = getopt_long(argc, argv, "hve", longopts, &longopt)) >= 0){
 		switch(opt){
 			case 'h':
