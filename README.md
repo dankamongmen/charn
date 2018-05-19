@@ -51,6 +51,11 @@ On Debian-derived systems, this includes:
 * From git: autoreconf -fis && ./configure && make && sudo make install
 * From tarball: ./configure && make && sudo make install
 
+## Testing
+
+Within an existing X session, it's best to use Xephyr. Xnest does not provide
+a sufficient xrandr implementation.
+
 ## Reading
 
 * http://www.sprezzatech.com/blog/0014-new-directions-in-window-management-p1.html
