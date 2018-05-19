@@ -13,6 +13,7 @@
 #include <xcb/xcb_ewmh.h>
 #include <xcb/xcb_event.h>
 #include <xcb/xcb_keysyms.h>
+#include <charn.h>
 
 // FIXME wrap this state up into an object
 static xcb_key_symbols_t *syms;
@@ -129,17 +130,20 @@ xcb_window_t xcb_init(Display *disp){
 	xcb_screen_t *xscr;
 	xcb_window_t wid;
 
+	prefscr = 0;
 	if(disp){ // mixed X11+XCB mode
+		Vfprintf(stdout, "Display set, using mixed X11+XCB mode\n");
 		if((xcb = XGetXCBConnection(disp)) == NULL){
-			fprintf(stderr,"Couldn't extract XCB connection from X11\n");
+			fprintf(stderr, "Couldn't extract XCB connection from X11\n");
 			goto err;
 		}
-	}else if((xcb = xcb_connect(NULL,&prefscr)) == NULL){
-		fprintf(stderr,"Couldn't connect to $DISPLAY via XCB\n");
+		// FIXME want to extract prefscr from xcb, if possible
+	}else if((xcb = xcb_connect(NULL, &prefscr)) == NULL){
+		fprintf(stderr, "Couldn't connect to $DISPLAY via XCB\n");
 		goto err;
 	}
 	if((xcbsetup = xcb_get_setup(xcb)) == NULL){
-		fprintf(stderr,"Couldn't get XCB setup\n");
+		fprintf(stderr, "Couldn't get XCB setup\n");
 		goto err;
 	}
 	if(get_xcb_vendor(xcbsetup)){
@@ -148,13 +152,13 @@ xcb_window_t xcb_init(Display *disp){
 	xcbfd = xcb_get_file_descriptor(xcb);
 	printf("Connected using XCB protocol %hu.%hu on fd %d\n",
 			xcbsetup->protocol_major_version,
-			xcbsetup->protocol_minor_version,xcbfd);
-	if(xcb_ewmh_init_atoms(xcb,&ewmhconn) == NULL){
-		fprintf(stderr,"Couldn't get EWMH properties\n");
+			xcbsetup->protocol_minor_version, xcbfd);
+	if(xcb_ewmh_init_atoms(xcb, &ewmhconn) == NULL){
+		fprintf(stderr, "Couldn't get EWMH properties\n");
 		goto err;
 	}
 	if((xscr = xcb_aux_get_screen(xcb,prefscr)) == NULL){
-		fprintf(stderr,"Couldn't get XCB screen info\n");
+		fprintf(stderr, "Couldn't get XCB screen info\n");
 		goto err;
 	}
 	// FIXME from whence these constants? they work like maxima, but

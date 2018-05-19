@@ -11,7 +11,7 @@ extern int ErrorSoftfail; // if non-0, don't call through to Xlib error handler
 // Diagnostics
 static inline int
 Vfprintf(FILE *f, const char *fmt, ...){
-	int ret;
+	int ret = 0;
 
 	if(Verbose){
 		va_list args;
