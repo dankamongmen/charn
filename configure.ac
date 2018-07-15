@@ -66,10 +66,6 @@ PKG_CHECK_MODULES(XKBCOMMON, xkbcommon, [have_xkbcommon=yes])
 	CFLAGS+=" $XKBCOMMON_CFLAGS"
 	LIBS+=" $XKBCOMMON_LIBS"
 
-PKG_CHECK_MODULES(FREETYPE, freetype2, [have_freetype2=yes])
-	CFLAGS+=" $FREETYPE_CFLAGS"
-	LIBS+=" $FREETYPE_LIBS"
-
 PKG_CHECK_MODULES(FTGL, ftgl, [have_ftgl=yes])
 	CFLAGS+=" $FTGL_CFLAGS"
 	LIBS+=" $FTGL_LIBS"
