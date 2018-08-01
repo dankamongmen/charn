@@ -32,7 +32,7 @@ charn_SOURCES = src/bin/charn.c src/bin/epoll.c src/bin/glew.c \
 
 $(doc_DIR)/@PACKAGE_NAME@.ent:
 	@mkdir -p $(@D)
-	echo -e '<!ENTITY dhfirstname "Nick">\n<!ENTITY dhsurname "Black">\n<!ENTITY dhemail "nick.black@sprezzatech.com">\n<!ENTITY dhusername "&dhfirstname; &dhsurname;">\n<!ENTITY dhrelease "$(VERSION)">' > "$@"
+	echo -e '<!ENTITY dhfirstname "Nick">\n<!ENTITY dhsurname "Black">\n<!ENTITY dhemail "dankamongmen@gmail.com">\n<!ENTITY dhusername "&dhfirstname; &dhsurname;">\n<!ENTITY dhrelease "$(VERSION)">' > "$@"
 
 clean-local:
 	rm -rf $(MANS) $(doc_DIR)/@PACKAGE_NAME@.ent
