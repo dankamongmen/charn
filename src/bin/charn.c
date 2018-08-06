@@ -41,7 +41,7 @@ int main(int argc,char **argv){
 	CharnConfig cc;
 	Display *dpy;
 
-	if((setlocale(LC_ALL,NULL)) == NULL){
+	if((setlocale(LC_ALL, "")) == NULL){
 		fprintf(stderr,"Couldn't setlocale(LC_ALL)\n");
 		return EXIT_FAILURE;
 	}
